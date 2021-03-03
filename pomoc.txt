@@ -1,0 +1,6 @@
+kolory:
+#DDC2A4
+#C47D70
+#CEB38F
+#C27655
+#5A3D47
