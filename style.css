@@ -1,0 +1,119 @@
+/* Color palette used:
+ * #C47D70 - light brown
+ * #C27655 - pastel orange
+ * #CEB38F - dark beige
+ * #DDC2A4 - beige
+ * #F5D6F4 - light pink
+ * #875F79 - violet
+ * #5A3D47 - deep purple
+ */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.outer {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: auto;
+    grid-template-rows: 60px auto;
+
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: black;
+    border: 1px solid black;
+}
+
+header.menu {
+    grid-row-start: 1;
+    grid-row-end: 2;
+
+    background: #CEB38F; /* dark beige */
+    font-size: 48px;
+    padding: 0 12px;
+    height: 60px;
+}
+
+.grid-plane {
+    grid-row-start: 2;
+    grid-row-end: 3;
+
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: auto auto auto auto;
+    grid-template-rows: auto auto auto auto;
+
+    background: black;
+    height: 100%;
+}
+
+aside.files {
+    grid-row-start: 1;
+    grid-row-end: 5;
+
+    background: #C27655; /* pastel orange */
+}
+
+section.main {
+    grid-row-start: 1;
+    grid-row-end: 4;
+    grid-column-start: 2;
+    grid-column-end: 4;
+
+    background: #DDC2A4; /* beige */
+    font-family: monospace;
+}
+
+section.program-elements {
+    grid-row-start: 1;
+    grid-row-end: 4;
+
+    background: #C47D70; /* light brown */
+}
+
+.bottom {
+    grid-row-start: 4;
+    grid-row-end: 5;
+    grid-column-start: 2;
+    grid-column-end: 5;
+
+    display: grid;
+    grid-gap: 0;
+    grid-template-columns: auto;
+    grid-template-rows: 30px auto;
+}
+
+nav.tabs {
+    display: grid;
+    grid-gap: 0;
+    grid-template-columns: auto auto auto auto;
+    grid-template-rows: auto;
+
+    background: #5A3D47; /* deep purple */
+}
+
+div.tab-label {
+    height: 20px;
+    width: 50px;
+    margin: auto;
+    text-align: center;
+    background: #875F79; /* violet */
+}
+
+section.tab-data {
+    background: #F5D6F4; /* light pink */
+}
+
+/* Large viewport */
+@media (min-width: 800px) {
+    .left-big { /* unused */
+        float: left;
+    }
+}
+
+/* Small viewport */
+@media (max-width: 800px) {
+
+}

@@ -3,50 +3,46 @@
 <html lang="en">
   <head>
     <title>Code Editor</title>
-	<link rel="stylesheet" href="styles.css"/>
+	<link rel="stylesheet" href="style.css"/>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<meta name="keywords" content="Code, Editor, Text, Online"/>
 	<meta name="description" content="An online code editor"/>
   </head>
   <body>
-    <div class="outer-flex">
-			<header>
+    <div class="outer">
+			<header class="menu">
 				Menu bar
 			</header>
-			<div>
-				<aside class="left">
+			<div class="grid-plane">
+				<aside class="files">
 					File selection dialog
 				</aside>
-				<div> <!-- col2 -->
-					<div> <!-- row1 -->
-						<section>
-							Text field for program code.
-						</section>
-						<section>
-							Focus on program elements.
-						</section>
-					</div>
-					<section> <!-- row2 -->
-						<nav>
-							<div class="nav-tab">
+				<section class="main">
+					Text field for program code.
+				</section>
+				<section class="program-elements">
+					Focus on program elements.
+				</section>
+				<section class="bottom">
+					<nav class="tabs">
+							<div class="tab-label">
 								Tab1
 							</div>
-							<div class="nav-tab">
+							<div class="tab-label">
 								Tab2
 							</div>
-							<div class="nav-tab">
+							<div class="tab-label">
 								Tab3
 							</div>
-							<div class="nav-tab">
+							<div class="tab-label">
 								Tab4
 							</div>
-						</nav>
-						<section>
-							Container for tab data
-						</section>
+					</nav>
+					<section class="tab-data">
+						Container for tab data
 					</section>
-				</div>
+				</section>
 			</div>
 	  </div>
   </body>
