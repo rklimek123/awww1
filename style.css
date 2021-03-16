@@ -30,6 +30,16 @@ aside.files {
     overflow: auto;
 }
 
+section.main {
+    background: #DDC2A4; /* beige */
+    padding: 5px 10px 5px 10px;
+}
+
+pre {
+    padding: 10px;
+    margin: 0;
+}
+
 pre.files-text {
     font-family: monospace;
 }
@@ -43,15 +53,20 @@ section.main {
     padding: 5px 10px 5px 10px;
 }
 
+pre.code {
+    padding-left: 0;
+    padding-bottom: 0;
+}
+
 pre.code:before {
     counter-reset: codeline;
 }
 
-code {
+pre.code > code {
     counter-increment: codeline;
 }
 
-code::before {
+pre.code > code::before {
     content: counter(codeline) "| ";
     display: inline-block;
     width: 8%;
@@ -92,6 +107,10 @@ section.tab-data {
     height: calc(100% - (30px + 1px));
     background: #F5D6F4; /* light pink */
     overflow-x: auto;
+}
+
+.gray {
+    color: gray;
 }
 
 /* Large viewport */
