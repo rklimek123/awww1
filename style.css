@@ -8,6 +8,9 @@ body {
 
 .color1 {
     --menu-bar: #CEB38F;            /* dark beige */
+    --menu-tab: beige;              /* light beige */
+    --menu-dropdown: #FFFF99;       /* light yellow */
+    --menu-dropdown-hover: #FFFF33; /* light yellow accent */
     --files: #C27655;               /* pastel orange */
     --main: #DDC2A4;                /* beige */
     --program-elements: #C47D70;    /* light brown */
@@ -23,6 +26,7 @@ body {
 
 .color2 {
     --menu-bar: #CEB38F;            /* dark beige */
+    --menu-tab: beige;              /* light beige */
     --files: #C27655;               /* pastel orange */
     --main: #DDC2A4;                /* beige */
     --program-elements: #C47D70;    /* light brown */
@@ -41,7 +45,36 @@ body {
 }
 
 header.menu {
+    display: flex;
+    justify-content: space-between;
+
     background: var(--menu-bar);
+}
+
+header.menu > div {
+    text-align: center;
+    flex-basis: 20%;
+    background: var(--menu-tab);
+    position: relative;
+}
+
+div.dropdown {
+    position: absolute;
+    display: none;
+    width: 100%;
+}
+
+:hover > div.dropdown {
+    display: block;
+}
+
+:hover > div.dropdown > a {
+    display: block;
+    background: var(--menu-dropdown);
+}
+
+:hover > div.dropdown > a:hover {
+    background: var(--menu-dropdown-hover);
 }
 
 aside.files {
@@ -156,7 +189,7 @@ section.tab-data {
         display: grid;
         grid-gap: 1px;
         grid-template-columns: 25vw 25vw 25vw 25vw;
-        grid-template-rows: 25vh 25vh 25vh calc(25vh - 60px);
+        grid-template-rows: 25vh 25vh 20vh calc(30vh - 60px);
 
         background: black;
         height: 100%;
