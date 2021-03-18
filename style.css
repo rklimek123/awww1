@@ -58,14 +58,14 @@ body {
     border: 1px solid black;
 }
 
-header.menu {
+.menu {
     display: flex;
     justify-content: space-between;
 
     background: var(--menu-bar);
 }
 
-header.menu > div {
+.menu > div {
     text-align: center;
     flex-basis: 25%;
     background: var(--menu-tab);
@@ -73,31 +73,31 @@ header.menu > div {
     cursor: pointer;
 }
 
-div.dropdown {
+.dropdown {
     position: absolute;
     display: none;
     width: 100%;
 }
 
-:hover > div.dropdown {
+:hover > .dropdown {
     display: block;
 }
 
-:hover > div.dropdown > a {
+:hover > .dropdown > a {
     display: block;
     background: var(--menu-dropdown);
 }
 
-:hover > div.dropdown > a:hover {
+:hover > .dropdown > a:hover {
     background: var(--menu-dropdown-hover);
 }
 
-aside.files {
+.files {
     background: var(--files);
     overflow: auto;
 }
 
-section.main {
+.main {
     background: var(--main);
     padding: 5px 10px 5px 10px;
 }
@@ -107,28 +107,28 @@ pre {
     margin: 0;
 }
 
-pre.files-text {
+.files-text {
     font-family: monospace;
 }
 
-pre.files-text > b {
+.files-text > b {
     color: var(--bold-color);
 }
 
-pre.code {
+.code {
     padding-left: 0;
     padding-bottom: 0;
 }
 
-pre.code:before {
+.code:before {
     counter-reset: codeline;
 }
 
-pre.code > code {
+.code > code {
     counter-increment: codeline;
 }
 
-pre.code > code::before {
+.code > code::before {
     content: counter(codeline) "| ";
     display: inline-block;
     width: 8%;
@@ -136,7 +136,7 @@ pre.code > code::before {
     color: var(--light-color);
 }
 
-section.program-elements {
+.program-elements {
     background: var(--program-elements);
 }
 
@@ -177,7 +177,7 @@ nav.tabs > ul > li.active {
     border-bottom: 30px solid var(--tab-active);
 }
 
-section.tab-data {
+.tab-data {
     border-top: 1px solid black;
     height: calc(100% - (30px + 1px));
     background: var(--tab-data);
@@ -202,7 +202,7 @@ section.tab-data {
         height: calc(100vh - 3px);
     }
 
-    header.menu {
+    .menu {
         grid-row-start: 1;
         grid-row-end: 2;
 
@@ -223,14 +223,14 @@ section.tab-data {
         height: 100%;
     }
 
-    aside.files {
+    .files {
         grid-row-start: 1;
         grid-row-end: 5;
 
         overflow: auto;
     }
 
-    section.main {
+    .main {
         grid-row-start: 1;
         grid-row-end: 4;
         grid-column-start: 2;
@@ -239,7 +239,7 @@ section.tab-data {
         overflow: auto;
     }
 
-    section.program-elements {
+    .program-elements {
         grid-row-start: 1;
         grid-row-end: 4;
 
@@ -253,7 +253,7 @@ section.tab-data {
         grid-column-end: 5;
     }
 
-    section.tab-data {
+    .tab-data {
         overflow: auto;
     }
 }
@@ -264,7 +264,7 @@ section.tab-data {
         overflow-y: scroll;
     }
 
-    header.menu {
+    .menu {
         position: sticky;
         top: 0;
         padding: 0 6px;
@@ -277,12 +277,12 @@ section.tab-data {
         min-height: 300px;
     }
 
-    section.main {
+    .main {
         min-height: 90vh;
         border-top: 1px solid black;
     }
 
-    section.program-elements {
+    .program-elements {
         min-height: 40vh;
         border-top: 1px solid black;
     }
@@ -291,7 +291,7 @@ section.tab-data {
         border-top: 1px solid black;
     }
 
-    section.tab-data {
+    .tab-data {
         min-height: 200px;
     }
 }
