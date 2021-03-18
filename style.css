@@ -16,6 +16,7 @@ body {
     --program-elements: #C47D70;    /* light brown */
     --tabs-bar: #5A3D47;            /* deep purple */
     --tab-inactive: #875F79;        /* violet */
+    --tab-hover: #A97797;           /* light violet */
     --tab-active: #FDFD96;          /* pastel yellow */
     --tab-data: #F5D6F4;            /* light pink */
 
@@ -53,9 +54,10 @@ header.menu {
 
 header.menu > div {
     text-align: center;
-    flex-basis: 20%;
+    flex-basis: 25%;
     background: var(--menu-tab);
     position: relative;
+    cursor: pointer;
 }
 
 div.dropdown {
@@ -132,6 +134,7 @@ nav.tabs {
 nav.tabs > ul {
     margin: 0;
     padding: 0;
+    cursor: default;
 }
 
 nav.tabs > ul > li {
@@ -139,6 +142,18 @@ nav.tabs > ul > li {
     text-align: center;
     font-size: 20px;
     border-bottom: 30px solid var(--tab-inactive);
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    height: 0;
+    width: 60px;
+    cursor: pointer;
+}
+
+nav.tabs > ul > li:hover {
+    display: inline-block;
+    text-align: center;
+    font-size: 20px;
+    border-bottom: 30px solid var(--tab-hover);
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
     height: 0;
