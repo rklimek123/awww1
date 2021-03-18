@@ -26,19 +26,32 @@ body {
 }
 
 .color2 {
-    --menu-bar: #CEB38F;            /* dark beige */
-    --menu-tab: beige;              /* light beige */
-    --files: #C27655;               /* pastel orange */
-    --main: #DDC2A4;                /* beige */
-    --program-elements: #C47D70;    /* light brown */
-    --tabs-bar: #5A3D47;            /* deep purple */
-    --tab-inactive: #875F79;        /* violet */
-    --tab-active: #FDFD96;          /* pastel yellow */
-    --tab-data: #F5D6F4;            /* light pink */
+    --menu-bar: #80CE87;            /* light green */
+    --menu-tab: #22B455;            /* green */
+    --menu-dropdown: #22B455;       /* green */
+    --menu-dropdown-hover: #92E5A1; /* lighter green */
+    --files: #204829;               /* dark green */
+    --main: #020204;                /* black */
+    --program-elements: #204829;    /* dark green */
+    --tabs-bar: #80CE87;            /* light green */
+    --tab-inactive: #22B455;        /* green */
+    --tab-hover: #92E5A1;           /* lighter green */
+    --tab-active: lime;             /* lime */
+    --tab-data: #020204;            /* black */
 
-    --bold-color: yellow;
-    --light-color: lavender;
+    --bold-color: lime;
+    --light-color: #92E5A1;
     color: white;
+}
+
+.color2 ::-moz-selection {
+    color: white;
+    background: lime;
+}
+
+.color2 ::selection {
+    color: white;
+    background: lime;
 }
 
 .outer {
