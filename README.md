@@ -95,11 +95,13 @@ Their content is described below.
 `# frama-c -wp -wp-log="r:result.txt"  <filename>.c`
 
 Menu should contain an option to rerun verification operation on the current file. It should be run depending on the chosen configuration of proovers and verification conditions. Example commands that can be run here are
-`
+
      # frama-c -wp -wp-prover alt-ergo -wp-prop="-@invariant" <filename>.c
+     
      # frama-c -wp -wp-prover alt-ergo -wp-rte  <filename>.c
+          
      # frama-c -wp -wp-prover alt-ergo -wp-prop="-@invariant" -wp-rte  <filename>.c
-`
+
 The application should memorise the status of proving for obligations.
 
 **Points**
