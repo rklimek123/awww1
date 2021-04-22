@@ -6,5 +6,5 @@
 {% for file in inroot_files %}
 <pre class="files-text">
  |
- └-->{{ file.name }}</pre>
+ └-->{% if file == selected_file %}<span class="selected">{% endif %}<a href="{% url 'main' id=file.pk %}">{{ file.name }}</a>{% if file == selected_file %}</span>{% endif %}</pre>
 {% endfor %}

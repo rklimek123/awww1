@@ -23,7 +23,7 @@
             {% endcomment %}
 <pre class="files-text">
  {% for i in stage|add:"1"|range %}|   {% endfor %}|
- {% for i in stage|add:"1"|range %}|   {% endfor %}└-->{{ file.name }}
+ {% for i in stage|add:"1"|range %}|   {% endfor %}└-->{% if file == selected_file %}<span class="selected">{% endif %}<a href="{% url 'main' id=file.pk %}">{{ file.name }}</a>{% if file == selected_file %}</span>{% endif %}
 </pre>
         {% endfor %}
     {% endif %}

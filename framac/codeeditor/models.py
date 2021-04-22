@@ -98,7 +98,7 @@ class FileSection(models.Model):
     section_status = models.ForeignKey(SectionStatus, on_delete=models.SET_NULL, null=True)
     section_status_data = models.ForeignKey(SectionStatusData, on_delete=models.SET_NULL, null=True)
 
-    content = models.FileField(max_length=2000)
+    content = models.FileField(max_length=1000000)
     is_subsection = models.BooleanField(default=False)
     parent_section = models.ForeignKey('self', on_delete=models.CASCADE, limit_choices_to={'is_subsection': True})
     parent_file = models.ForeignKey(File, on_delete=models.CASCADE, limit_choices_to={'is_subsection': False})

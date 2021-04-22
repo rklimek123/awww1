@@ -19,7 +19,8 @@
 		        {% include './files.html' %}
             </aside>
             <div class="main">
-		        {% include './main.html' %}
+                {% block main %}
+                {% endblock %}
             </div>
             <div class="program-elements">
 		        {% include './program-elements.html' %}

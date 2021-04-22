@@ -1,7 +1,9 @@
 from django.urls import include, path
 
-from .views import CodeEditorView
+from .views import CodeEditorViewBlank
+from .views import CodeEditorViewSelected
 
 urlpatterns = [
-    path('', CodeEditorView.as_view(), name='index'),
+    path('', CodeEditorViewBlank.as_view(), name='index'),
+    path('file/<int:id>', CodeEditorViewSelected.as_view(), name='main'),
 ]
