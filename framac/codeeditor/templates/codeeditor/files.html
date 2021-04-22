@@ -1,11 +1,10 @@
 <pre class="files-text">
-../project:
-	 |
-	 └-->src:
-	 |   |
-	 |   └--><b>bubble_and_insertion-sort.cpp</b>
-	 |
-	 └-->bin:
-	     |
-	     └-->bubble_and_insertion-sort
-</pre>
+~:</pre>
+{% for dir in inroot_dirs %}
+{% include './auxiliary/dir_tree.html' with stage=0 %}
+{% endfor %}
+{% for file in inroot_files %}
+<pre class="files-text">
+ |
+ └-->{{ file.name }}</pre>
+{% endfor %}

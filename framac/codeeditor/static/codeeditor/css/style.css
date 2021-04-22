@@ -108,11 +108,14 @@ pre {
 }
 
 .files-text {
+    padding-top: 0;
+    padding-bottom: 0;
     font-family: monospace;
 }
 
-.files-text > b {
+.files-text > .selected {
     color: var(--bold-color);
+    font-weight: bold;
 }
 
 .code {

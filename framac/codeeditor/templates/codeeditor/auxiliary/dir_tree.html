@@ -1,0 +1,30 @@
+{%  load pipes %}
+<pre class="files-text">
+ {% for i in stage|range %}|   {% endfor %}|
+ {% for i in stage|range %}|   {% endfor %}└-->{{ dir.name }}
+</pre>
+{% for direct, q in in_dirs.items %}
+    {% if direct == dir %}
+        {% for dir in q %}
+            {% with dir_template="codeeditor/auxiliary/dir_tree.html" %}
+                {% include dir_template with stage=stage|add:"1" %}
+            {% endwith %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+{% for direct, q in in_files.items %}
+    {% if direct == dir %}
+        {% for file in q %}
+            {% comment %}
+                Żeby nie było tutaj niepotrzebnych linii '|' ciągnących się do dołu, całego fora można
+                zamienić w custom taga, któy to sklei na podstawie wiedzy o stage'u i o tym, gdzie ma postawić pałkę,
+                a gdzie nie. Tę informację mógłby uzyskać, gdybyśmy dzielili query z folderami-dziećmi na wszystkie
+                + ostatni, i gdy nie ma w danym folderze plików, to odhaczali, że ostatniej pałki ma nie dawać.
+            {% endcomment %}
+<pre class="files-text">
+ {% for i in stage|add:"1"|range %}|   {% endfor %}|
+ {% for i in stage|add:"1"|range %}|   {% endfor %}└-->{{ file.name }}
+</pre>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
