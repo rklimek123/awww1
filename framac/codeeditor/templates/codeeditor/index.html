@@ -1,0 +1,33 @@
+{%  load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Code Editor</title>
+	<link rel="stylesheet" href="{% static 'codeeditor/css/style.css' %}"/>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta name="keywords" content="Code, Editor, Text, Online"/>
+	<meta name="description" content="An online code editor"/>
+</head>
+<body class="color1">
+    <div class="outer">
+        <header class="menu">
+	        {% include './menu.html' %}
+        </header>
+	    <div class="plane">
+            <aside class="files">
+		        {% include './files.html' %}
+            </aside>
+            <div class="main">
+		        {% include './main.html' %}
+            </div>
+            <div class="program-elements">
+		        {% include './program-elements.html' %}
+            </div>
+		    <div class="bottom">
+		        {% include './tabs.html' %}
+		    </div>
+	    </div>
+	</div>
+</body>
+</html>

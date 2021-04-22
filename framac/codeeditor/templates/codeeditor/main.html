@@ -1,0 +1,76 @@
+<pre class="code">
+<code>#include &lt;stdio.h&gt;</code>
+<code></code>
+<code>void swap(int *xp, int *yp) </code>
+<code>{ </code>
+<code>    int temp = *xp; </code>
+<code>    *xp = *yp; </code>
+<code>    *yp = temp; </code>
+<code>} </code>
+<code>  </code>
+<code>// A function to implement bubble sort </code>
+<code>void bubbleSort(int arr[], int n) </code>
+<code>{ </code>
+<code>   int i, j; </code>
+<code>   for (i = 0; i &lt; n-1; i++)       </code>
+<code>  </code>
+<code>       // Last i elements are already in place    </code>
+<code>       for (j = 0; j &lt; n-i-1; j++)  </code>
+<code>           if (arr[j] > arr[j+1]) </code>
+<code>              swap(&arr[j], &arr[j+1]); </code>
+<code>} </code>
+<code>  </code>
+<code>/* Function to print an array */</code>
+<code>void printArray(int arr[], int size) </code>
+<code>{ </code>
+<code>    int i; </code>
+<code>    for (i=0; i &lt; size; i++) </code>
+<code>        printf("%d ", arr[i]); </code>
+<code>    printf("\n"); </code>
+<code>}</code>
+<code></code>
+<code>int bubble() {</code>
+<code>    int arr[] = {64, 34, 25, 12, 22, 11, 90}; </code>
+<code>    int n = sizeof(arr)/sizeof(arr[0]); </code>
+<code>    bubbleSort(arr, n); </code>
+<code>    printf("Sorted array: \n"); </code>
+<code>    printArray(arr, n); </code>
+<code>    return 0; </code>
+<code>}</code>
+<code></code>
+<code></code>
+<code>int main(){</code>
+<code></code>
+<code>   /* Here i & j for loop counters, temp for swapping,</code>
+<code>    * count for total number of elements, number[] to</code>
+<code>    * store the input numbers in array. You can increase</code>
+<code>    * or decrease the size of number array as per requirement</code>
+<code>    */</code>
+<code>   int i, j, count, temp, number[25];</code>
+<code></code>
+<code>   printf("How many numbers u are going to enter?: ");</code>
+<code>   scanf("%d",&count);</code>
+<code></code>
+<code>   printf("Enter %d elements: ", count);</code>
+<code>   // This loop would store the input numbers in array</code>
+<code>   for(i=0; i &lt; count; i++)</code>
+<code>      scanf("%d",&number[i]);</code>
+<code></code>
+<code>   // Implementation of insertion sort algorithm</code>
+<code>   for(i=1; i &lt; count; i++){</code>
+<code>      temp=number[i];</code>
+<code>      j=i-1;</code>
+<code>      while((temp &lt; number[j])&&(j>=0)){</code>
+<code>         number[j+1]=number[j];</code>
+<code>         j=j-1;</code>
+<code>      }</code>
+<code>      number[j+1]=temp;</code>
+<code>   }</code>
+<code></code>
+<code>   printf("Order of Sorted elements: ");</code>
+<code>   for(i=0; i &lt; count; i++)</code>
+<code>      printf(" %d",number[i]);</code>
+<code></code>
+<code>   return 0;</code>
+<code>}</code>
+</pre>
