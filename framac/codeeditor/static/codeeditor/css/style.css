@@ -19,6 +19,7 @@ body {
     --tab-hover: #A97797;           /* light violet */
     --tab-active: #FDFD96;          /* pastel yellow */
     --tab-data: #F5D6F4;            /* light pink */
+    --link: blue;
 
     --bold-color: darkblue;
     --light-color: gray;
@@ -38,6 +39,7 @@ body {
     --tab-hover: #92E5A1;           /* lighter green */
     --tab-active: lime;             /* lime */
     --tab-data: #020204;            /* black */
+    --link: yellow;
 
     --bold-color: lime;
     --light-color: #92E5A1;
@@ -79,6 +81,15 @@ body {
     width: 100%;
 }
 
+.dropdown a {
+    color: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: var(--link);
+}
+
 :hover > .dropdown {
     display: block;
 }
@@ -116,6 +127,14 @@ pre {
 .files-text > .selected {
     color: var(--bold-color);
     font-weight: bold;
+}
+
+.files-text > .selected::before {
+    content: " [==> ";
+}
+
+.files-text > .selected::after {
+    content: " <==] ";
 }
 
 .code {
