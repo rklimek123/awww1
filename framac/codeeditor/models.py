@@ -1,23 +1,5 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.password_validation import validate_password
-
-
-class User(models.Model):
-    name = models.TextField(max_length=200)
-    login = models.TextField(max_length=200)
-    password = models.TextField(max_length=78)
-    creation_date = models.DateTimeField(auto_now_add=True)
-    modify_date = models.DateTimeField(auto_now=True)
-    available = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
-    def save(self):
-        validate_password(self.password)
-        self.password = make_password(self.password)
-        super().save()
+from django.contrib.auth.models import User
 
 
 class Directory(models.Model):
