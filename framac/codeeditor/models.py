@@ -58,10 +58,17 @@ class File(models.Model):
             if section.creation_date > last_modified:
                 last_modified = section.creation_date
 
-        string = "/* Author:        " + self.owner.first_name + " " + self.owner.last_name +\
+        string = "/* Author:        " + str(self.owner) +\
                  "\n * Created at:    " + str(self.creation_date) +\
                  "\n * Last modified: " + str(last_modified) +\
-                 "\n */\n"
+                 "\n * Description:   "
+        description = ["None"]
+        if self.description is not None:
+            description = self.description.splitlines()
+        string += description[0] + "\n"
+        for line in description[1:]:
+            string += " *                " + line + "\n"
+        string += " */\n"
         for section in sections:
             string = string + section.get_content("") + "\n"
         return string
@@ -114,10 +121,10 @@ class FileSection(models.Model):
                                        on_delete=models.SET_NULL,
                                        null=True,
                                        limit_choices_to={'available': True})
-    section_status_data = models.ForeignKey(SectionStatusData,
-                                            on_delete=models.SET_NULL,
-                                            null=True,
-                                            limit_choices_to={'available': True})
+    section_status_data = models.OneToOneField(SectionStatusData,
+                                               on_delete=models.SET_NULL,
+                                               null=True,
+                                               limit_choices_to={'available': True})
 
     content = models.CharField(max_length=1000000)
     is_subsection = models.BooleanField(default=False)
@@ -154,6 +161,11 @@ class FileSection(models.Model):
                 raise Exception("Main Section doesn't have a file parent.")
         super().save(args, kwargs)
 
+    def delete(self):
+        status_data = self.section_status_data
+        status_data.delete()
+        super().delete()
+
     def get_raw_name(self):
         if self.name is not None:
             return self.name
@@ -163,10 +175,25 @@ class FileSection(models.Model):
     def get_content(self, ident):
         tab = "    "
         string = ident + "{ Section      " + self.get_raw_name() + "\n" +\
-                 ident + "  Category:    " + str(self.section_category) + "\n" +\
-                 ident + "  Status:      " + str(self.section_status) + "\n" +\
-                 ident + "  Status data: " + self.section_status_data.content + "\n" +\
-                 ident + "  Owner:       " + str(self.section_status_data.user) + "}\n"
+                 ident + "  Description: "
+        description = ["None"]
+        if self.description is not None:
+            description = self.description.splitlines()
+        string += description[0] + "\n"
+        for line in description[1:]:
+            string += ident + "               " + line + "\n"
+
+        string += ident + "  Category:    " + str(self.section_category) + "\n" +\
+                  ident + "  Status:      " + str(self.section_status) + "\n" +\
+                  ident + "  Status data: "
+        status_data = ["No data"]
+        if self.section_status_data is not None:
+            status_data = self.section_status_data.content.splitlines()
+        string += status_data[0] + "\n"
+        for line in status_data[1:]:
+            string += ident + "               " + line + "\n"
+
+        string += ident + "  Owner:       " + str(self.section_status_data.user) + " }\n"
         ident += tab
         for line in self.content.splitlines():
             string += ident + line + "\n"

@@ -1,22 +1,24 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from django.views import View
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django.views import View
 
 from . import models
 from . import forms
+from . import urls
 
 
 class CodeEditorViewBlank(View):
     def get_context(self):
         ctx = {}
-        ctx['inroot_dirs'] = models.Directory.objects.filter(parent=None).order_by('name')
-        ctx['inroot_files'] = models.File.objects.filter(directory=None).order_by('name')
+        ctx['inroot_dirs'] = models.Directory.objects.filter(parent=None, available=True).order_by('name')
+        ctx['inroot_files'] = models.File.objects.filter(directory=None, available=True).order_by('name')
         ctx['in_dirs'] = {}
         ctx['in_files'] = {}
         for direct in models.Directory.objects.all():
-            children_dirs = models.Directory.objects.filter(parent=direct).order_by('name')
-            children_files = models.File.objects.filter(directory=direct).order_by('name')
+            children_dirs = models.Directory.objects.filter(parent=direct, available=True).order_by('name')
+            children_files = models.File.objects.filter(directory=direct, available=True).order_by('name')
             ctx['in_dirs'][direct] = children_dirs
             ctx['in_files'][direct] = children_files
         return ctx
@@ -46,11 +48,11 @@ class AddFileView(View):
 
             if form.is_valid():
                 file = models.File(name=form.cleaned_data['name'],
-                            description=form.cleaned_data['description'],
-                            directory=form.cleaned_data['directory'],
-                            owner=request.user)
+                                   description=form.cleaned_data['description'],
+                                   directory=form.cleaned_data['directory'],
+                                   owner=request.user)
                 file.save()
-                return HttpResponseRedirect('/file/' + str(file.pk))
+                return HttpResponseRedirect(reverse('main', kwargs={'id': file.pk}))
             else:
                 return render(request, 'codeeditor/addfile.html', {'form': form})
         else:
@@ -67,7 +69,7 @@ class AddSectionView(View):
 
             if form.is_valid():
                 status_data = models.SectionStatusData(content=form.cleaned_data['section_status_content'],
-                                                      user=request.user)
+                                                       user=request.user)
                 section = models.FileSection(name=form.cleaned_data['name'],
                                              description=form.cleaned_data['description'],
                                              section_category=form.cleaned_data['section_category'],
@@ -86,8 +88,29 @@ class AddSectionView(View):
 
                 file = section.get_file()
 
-                return HttpResponseRedirect('/file/' + str(file.pk))
+                return HttpResponseRedirect(reverse('main', kwargs={'id': file.pk}))
             else:
                 return render(request, 'codeeditor/addsection.html', {'form': form})
+        else:
+            return render(request, 'registration/login.html')
+
+
+class AddDirectoryView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'codeeditor/adddirectory.html', {'form': forms.AddDirectoryForm()})
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            form = forms.AddDirectoryForm(request.POST)
+
+            if form.is_valid():
+                directory = models.Directory(name=form.cleaned_data['name'],
+                                             description=form.cleaned_data['description'],
+                                             owner=request.user,
+                                             parent=form.cleaned_data['parent'])
+                directory.save()
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                return render(request, 'codeeditor/adddirectory.html', {'form': form})
         else:
             return render(request, 'registration/login.html')

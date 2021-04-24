@@ -4,7 +4,7 @@ from . import models
 
 class AddFileForm(forms.ModelForm):
     directory = forms.ModelChoiceField(label='Directory',
-                                       queryset=models.Directory.objects.all(),
+                                       queryset=models.Directory.objects.filter(available=True),
                                        empty_label="~",
                                        required=False)
 
@@ -44,3 +44,14 @@ class AddSectionForm(forms.ModelForm):
                   'section_status',
                   'section_status_content'
                   ]
+
+
+class AddDirectoryForm(forms.ModelForm):
+    parent = forms.ModelChoiceField(label='Parent directory',
+                                    queryset=models.Directory.objects.filter(available=True),
+                                    empty_label="~",
+                                    required=False)
+
+    class Meta:
+        model = models.Directory
+        fields = ['name', 'description', 'parent']
