@@ -23,9 +23,8 @@ class Directory(models.Model):
 class File(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=3000, blank=True, null=True)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
-    content = models.TextField(max_length=1000000, blank=True)
     directory = models.ForeignKey(Directory, on_delete=models.CASCADE, blank=True, null=True)
 
     creation_date = models.DateTimeField(auto_now_add=True)

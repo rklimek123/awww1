@@ -1,12 +1,12 @@
 from django.urls import include, path
 
-from .views import CodeEditorViewBlank
-from .views import CodeEditorViewSelected
+from . import views
 from django.contrib.auth import views as login_views
 
 urlpatterns = [
-    path('', CodeEditorViewBlank.as_view(), name='index'),
-    path('file/<int:id>', CodeEditorViewSelected.as_view(), name='main'),
+    path('', views.CodeEditorViewBlank.as_view(), name='index'),
+    path('file/<int:id>', views.CodeEditorViewSelected.as_view(), name='main'),
+    path('addfile/', views.AddFileView.as_view(), name='addfile'),
     path('login/', login_views.LoginView.as_view(), name='login'),
     path('logout/', login_views.LogoutView.as_view(), name='logout'),
 ]
