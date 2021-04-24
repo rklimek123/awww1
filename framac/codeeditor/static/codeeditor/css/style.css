@@ -97,6 +97,7 @@ a {
 :hover > .dropdown > a {
     display: block;
     background: var(--menu-dropdown);
+    border-top: 1px solid black;
 }
 
 :hover > .dropdown > a:hover {
