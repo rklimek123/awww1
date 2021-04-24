@@ -55,3 +55,15 @@ class AddDirectoryForm(forms.ModelForm):
     class Meta:
         model = models.Directory
         fields = ['name', 'description', 'parent']
+
+
+class DeleteFileForm(forms.Form):
+    file = forms.ModelChoiceField(label='File to delete',
+                                  queryset=models.File.objects.filter(available=True),
+                                  empty_label='No file chosen')
+
+
+class DeleteDirectoryForm(forms.Form):
+    directory = forms.ModelChoiceField(label='Directory to delete',
+                                       queryset=models.Directory.objects.filter(available=True),
+                                       empty_label='No directory chosen')

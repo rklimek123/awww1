@@ -21,7 +21,21 @@ class Directory(models.Model):
     available = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        return self.get_breadcrumbs()
+
+    def get_breadcrumbs(self):
+        string = self.name
+        directory = "~/"
+        if self.parent is not None:
+            directory = self.parent.get_breadcrumbs()
+        return directory + string + "/"
+
+    def mark_inavailable(self):
+        files = File.objects.filter(directory=self, available=True)
+        for file in files:
+            file.mark_inavailable()
+        self.available = False
+        self.save()
 
     class Meta:
         verbose_name_plural = "Directories"
@@ -46,10 +60,21 @@ class File(models.Model):
     available = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        string = self.name
+        directory = "~/"
+        if self.directory is not None:
+            directory = self.directory.get_breadcrumbs()
+        return directory + string
+
+    def mark_inavailable(self):
+        sections = FileSection.objects.filter(parent_file=self, available=True)
+        for section in sections:
+            section.mark_inavailable()
+        self.available = False
+        self.save()
 
     def get_content(self):
-        sections = FileSection.objects.filter(parent_file=self)
+        sections = FileSection.objects.filter(parent_file=self, available=True)
         last_modified = self.modify_date
 
         for section in sections:
@@ -166,6 +191,13 @@ class FileSection(models.Model):
         status_data.delete()
         super().delete()
 
+    def mark_inavailable(self):
+        subsections = FileSection.objects.filter(parent_section=self, available=True)
+        for section in subsections:
+            section.mark_inavailable()
+        self.available = False
+        self.save()
+
     def get_raw_name(self):
         if self.name is not None:
             return self.name
@@ -198,7 +230,7 @@ class FileSection(models.Model):
         for line in self.content.splitlines():
             string += ident + line + "\n"
 
-        subsections = FileSection.objects.filter(parent_section=self)
+        subsections = FileSection.objects.filter(parent_section=self, available=True)
         if subsections.exists():
             string += "\n"
             for section in subsections:

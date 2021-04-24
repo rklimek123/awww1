@@ -1,7 +1,7 @@
 {% extends './authlock.html' %}
-{% block title %}Add new section{% endblock %}
+{% block title %}Add new directory{% endblock %}
 {% block content %}
-<form action="/addsection/" method="POST">
+<form action="{{ action }}" method="POST">
     {% csrf_token %}
     {{ form.as_ul }}
     <input type="submit" value="OK">

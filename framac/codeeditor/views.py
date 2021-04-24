@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -6,7 +5,6 @@ from django.views import View
 
 from . import models
 from . import forms
-from . import urls
 
 
 class CodeEditorViewBlank(View):
@@ -31,7 +29,7 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
     def get(self, request, *args, **kwargs):
         file_id = kwargs['id']
         ctx = self.get_context()
-        file = get_object_or_404(models.File, pk=file_id)
+        file = get_object_or_404(models.File, pk=file_id, available=True)
         ctx['selected_file'] = file
         content = file.get_content()
         ctx['filelines'] = content.splitlines()
@@ -40,7 +38,10 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
 
 class AddFileView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'codeeditor/addfile.html', {'form': forms.AddFileForm()})
+        return render(request,
+                      'codeeditor/form.html',
+                      {'form': forms.AddFileForm(),
+                       'action': reverse('addfile')})
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -54,14 +55,17 @@ class AddFileView(View):
                 file.save()
                 return HttpResponseRedirect(reverse('main', kwargs={'id': file.pk}))
             else:
-                return render(request, 'codeeditor/addfile.html', {'form': form})
+                return render(request, 'codeeditor/form.html', {'form': form, 'action': reverse('addfile')})
         else:
             return render(request, 'registration/login.html')
 
 
 class AddSectionView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'codeeditor/addsection.html', {'form': forms.AddSectionForm()})
+        return render(request,
+                      'codeeditor/form.html',
+                      {'form': forms.AddSectionForm(),
+                       'action': reverse('addsection')})
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -90,14 +94,20 @@ class AddSectionView(View):
 
                 return HttpResponseRedirect(reverse('main', kwargs={'id': file.pk}))
             else:
-                return render(request, 'codeeditor/addsection.html', {'form': form})
+                return render(request,
+                              'codeeditor/form.html',
+                              {'form': form,
+                               'action': reverse('addsection')})
         else:
             return render(request, 'registration/login.html')
 
 
 class AddDirectoryView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'codeeditor/adddirectory.html', {'form': forms.AddDirectoryForm()})
+        return render(request,
+                      'codeeditor/form.html',
+                      {'form': forms.AddDirectoryForm(),
+                       'action': reverse('adddirectory')})
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -111,6 +121,57 @@ class AddDirectoryView(View):
                 directory.save()
                 return HttpResponseRedirect(reverse('index'))
             else:
-                return render(request, 'codeeditor/adddirectory.html', {'form': form})
+                return render(request,
+                              'codeeditor/form.html',
+                              {'form': form,
+                               'action': reverse('adddirectory')})
+        else:
+            return render(request, 'registration/login.html')
+
+
+class DeleteFileView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request,
+                      'codeeditor/form.html',
+                      {'form': forms.DeleteFileForm(),
+                       'action': reverse('deletefile')})
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            form = forms.DeleteFileForm(request.POST)
+
+            if form.is_valid():
+                file = form.cleaned_data['file']
+                file.mark_inavailable()
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                return render(request,
+                              'codeeditor/form.html',
+                              {'form': form,
+                               'action': reverse('deletefile')})
+        else:
+            return render(request, 'registration/login.html')
+
+
+class DeleteDirectoryView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request,
+                      'codeeditor/form.html',
+                      {'form': forms.DeleteDirectoryForm(),
+                       'action': reverse('deletedirectory')})
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            form = forms.DeleteDirectoryForm(request.POST)
+
+            if form.is_valid():
+                directory = form.cleaned_data['directory']
+                directory.mark_inavailable()
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                return render(request,
+                              'codeeditor/form.html',
+                              {'form': form,
+                               'action': reverse('deletedirectory')})
         else:
             return render(request, 'registration/login.html')
