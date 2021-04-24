@@ -29,10 +29,10 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
     def get(self, request, *args, **kwargs):
         file_id = kwargs['id']
         ctx = self.get_context()
-        ctx['selected_file'] = get_object_or_404(models.File, pk=file_id)
-        # tu jakoś wyciąganie i format sekcji
-        #content = ctx['selected_file'].content
-        #ctx['filelines'] = content.splitlines()
+        file = get_object_or_404(models.File, pk=file_id)
+        ctx['selected_file'] = file
+        content = file.get_content()
+        ctx['filelines'] = content.splitlines()
         return render(request, 'codeeditor/main.html', ctx)
 
 
@@ -66,22 +66,22 @@ class AddSectionView(View):
             form = forms.AddSectionForm(request.POST)
 
             if form.is_valid():
-                statusData = models.SectionStatusData(content=form.cleaned_data['section_status_content'],
+                status_data = models.SectionStatusData(content=form.cleaned_data['section_status_content'],
                                                       user=request.user)
                 section = models.FileSection(name=form.cleaned_data['name'],
                                              description=form.cleaned_data['description'],
                                              section_category=form.cleaned_data['section_category'],
                                              section_status=form.cleaned_data['section_status'],
-                                             section_status_data=statusData,
+                                             section_status_data=status_data,
                                              content=form.cleaned_data['content'],
                                              is_subsection=form.cleaned_data['is_subsection'],
                                              parent_section=form.cleaned_data['parent_section'],
                                              parent_file=form.cleaned_data['parent_file'])
-                statusData.save()
+                status_data.save()
                 try:
                     section.save()
                 except Exception as e:
-                    statusData.delete()
+                    status_data.delete()
                     raise e
 
                 file = section.get_file()

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Directory(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=3000, blank=True, null=True)
@@ -46,6 +47,24 @@ class File(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_content(self):
+        sections = FileSection.objects.filter(parent_file=self)
+        last_modified = self.modify_date
+
+        for section in sections:
+            if section.modify_date > last_modified:
+                last_modified = section.modify_date
+            if section.creation_date > last_modified:
+                last_modified = section.creation_date
+
+        string = "/* Author:        " + self.owner.first_name + " " + self.owner.last_name +\
+                 "\n * Created at:    " + str(self.creation_date) +\
+                 "\n * Last modified: " + str(last_modified) +\
+                 "\n */\n"
+        for section in sections:
+            string = string + section.get_content("") + "\n"
+        return string
 
 
 class SectionCategory(models.Model):
@@ -140,6 +159,24 @@ class FileSection(models.Model):
             return self.name
         else:
             return str(self.section_category)
+
+    def get_content(self, ident):
+        tab = "    "
+        string = ident + "{ Section      " + self.get_raw_name() + "\n" +\
+                 ident + "  Category:    " + str(self.section_category) + "\n" +\
+                 ident + "  Status:      " + str(self.section_status) + "\n" +\
+                 ident + "  Status data: " + self.section_status_data.content + "\n" +\
+                 ident + "  Owner:       " + str(self.section_status_data.user) + "}\n"
+        ident += tab
+        for line in self.content.splitlines():
+            string += ident + line + "\n"
+
+        subsections = FileSection.objects.filter(parent_section=self)
+        if subsections.exists():
+            string += "\n"
+            for section in subsections:
+                string += section.get_content(ident) + "\n"
+        return string
 
     def __str__(self):
         section = self
