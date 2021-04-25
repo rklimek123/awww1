@@ -1,3 +1,8 @@
+{% if focuslines %}
+<pre>
+<code>{{ focuslines }}</code>
+</pre>
+{% else %}
 <pre>
 <code>#include &lt;stdio.h&gt;</code>
 <code></code>
@@ -19,3 +24,4 @@
 <code>int main()</code>
 <code class="light">{...}</code>
 </pre>
+{% endif %}

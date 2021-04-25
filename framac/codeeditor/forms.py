@@ -10,7 +10,7 @@ class AddFileForm(forms.ModelForm):
 
     class Meta:
         model = models.File
-        fields = ['name', 'description', 'directory']
+        fields = ['content', 'description', 'directory']
 
 
 class AddSectionForm(forms.ModelForm):
@@ -22,15 +22,28 @@ class AddSectionForm(forms.ModelForm):
         psection = self.cleaned_data.get('parent_section')
         pfile = self.cleaned_data.get('parent_file')
 
+        begin = self.cleaned_data.get('begin')
+        end = self.cleaned_data.get('end')
+
         if pfile is not None and psection is not None:
             raise forms.ValidationError('Section must have only one parent.')
 
         if is_subsection:
             if psection is None:
                 raise forms.ValidationError("Subsection must have a section parent.")
+            super_begin = psection.begin
+            super_end = psection.end
+            if begin < super_begin or end > super_end:
+                raise forms.ValidationError("Subsection must be contained in parent section: (" +
+                                            super_begin + ", " + super_end + ")")
         else:
             if pfile is None:
                 raise forms.ValidationError("Main Section must have a file parent.")
+
+        if begin <= 0:
+            raise forms.ValidationError("Enter a positive line number")
+        if begin > end:
+            raise forms.ValidationError("End value should be greater or equal to begin")
 
     class Meta:
         model = models.FileSection
@@ -39,7 +52,8 @@ class AddSectionForm(forms.ModelForm):
                   'parent_file',
                   'name',
                   'description',
-                  'content',
+                  'begin',
+                  'end',
                   'section_category',
                   'section_status',
                   'section_status_content'

@@ -234,7 +234,7 @@ nav.tabs > ul > li.active {
         grid-row-end: 3;
         display: grid;
         grid-gap: 1px;
-        grid-template-columns: 25vw 25vw 25vw 25vw;
+        grid-template-columns: 25vw 25vw 20vw 30vw;
         grid-template-rows: 25vh 25vh 20vh calc(30vh - 60px);
 
         background: black;

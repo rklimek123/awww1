@@ -1,3 +1,5 @@
+import subprocess
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -30,9 +32,18 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
         file_id = kwargs['id']
         ctx = self.get_context()
         file = get_object_or_404(models.File, pk=file_id, available=True)
+
+        # Filesystem view
         ctx['selected_file'] = file
-        content = file.get_content()
-        ctx['filelines'] = content.splitlines()
+
+        # Code edit (main) view
+        ctx['filelines'] = file.get_content()
+
+        # Focus on program elements view
+        framac_call = 'frama-c -wp -wp-print ' + 'upload/' + file.content.name
+        result = subprocess.getstatusoutput(framac_call)
+        ctx['focuslines'] = result[1]
+
         return render(request, 'codeeditor/main.html', ctx)
 
 
@@ -45,11 +56,12 @@ class AddFileView(View):
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            form = forms.AddFileForm(request.POST)
+            form = forms.AddFileForm(request.POST, request.FILES)
 
             if form.is_valid():
-                file = models.File(name=form.cleaned_data['name'],
+                file = models.File(name=form.cleaned_data['content'].name,
                                    description=form.cleaned_data['description'],
+                                   content=form.cleaned_data['content'],
                                    directory=form.cleaned_data['directory'],
                                    owner=request.user)
                 file.save()

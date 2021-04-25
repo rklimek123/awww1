@@ -1,7 +1,7 @@
 {% extends './authlock.html' %}
 {% block title %}Add new directory{% endblock %}
 {% block content %}
-<form action="{{ action }}" method="POST">
+<form enctype="multipart/form-data" action="{{ action }}" method="POST">
     {% csrf_token %}
     {{ form.as_ul }}
     <input type="submit" value="OK">

@@ -49,6 +49,8 @@ class File(models.Model):
                               null=True,
                               limit_choices_to={'available': True})
 
+    content = models.FileField()
+
     directory = models.ForeignKey(Directory,
                                   on_delete=models.CASCADE,
                                   blank=True,
@@ -71,32 +73,45 @@ class File(models.Model):
         for section in sections:
             section.mark_inavailable()
         self.available = False
-        self.save()
+        super().save()
 
     def get_content(self):
-        sections = FileSection.objects.filter(parent_file=self, available=True)
-        last_modified = self.modify_date
+        # sections = FileSection.objects.filter(parent_file=self, available=True)
+        # last_modified = self.modify_date
+        #
+        # for section in sections:
+        #     if section.modify_date > last_modified:
+        #         last_modified = section.modify_date
+        #     if section.creation_date > last_modified:
+        #         last_modified = section.creation_date
+        #
+        # string = "/* Author:        " + str(self.owner) +\
+        #          "\n * Created at:    " + str(self.creation_date) +\
+        #          "\n * Last modified: " + str(last_modified) +\
+        #          "\n * Description:   "
+        # description = ["None"]
+        # if self.description is not None:
+        #     description = self.description.splitlines()
+        # string += description[0] + "\n"
+        # for line in description[1:]:
+        #     string += " *                " + line + "\n"
+        # string += " */\n"
+        # for section in sections:
+        #     string = string + section.get_content("") + "\n"
+        file = self.content
+        file.open("r")
+        lines = file.readlines()
+        file.close()
+        result = []
+        for line in lines:
+            result.append(line[:len(line) - 1])  # .readlines() puts a '\n' at the end of each line
+        return result
 
-        for section in sections:
-            if section.modify_date > last_modified:
-                last_modified = section.modify_date
-            if section.creation_date > last_modified:
-                last_modified = section.creation_date
-
-        string = "/* Author:        " + str(self.owner) +\
-                 "\n * Created at:    " + str(self.creation_date) +\
-                 "\n * Last modified: " + str(last_modified) +\
-                 "\n * Description:   "
-        description = ["None"]
-        if self.description is not None:
-            description = self.description.splitlines()
-        string += description[0] + "\n"
-        for line in description[1:]:
-            string += " *                " + line + "\n"
-        string += " */\n"
-        for section in sections:
-            string = string + section.get_content("") + "\n"
-        return string
+    def save(self):
+        if self.directory is not None:
+            path = self.directory.get_breadcrumbs()[2:]
+            self.content.name = path + self.content.name
+        super().save()
 
 
 class SectionCategory(models.Model):
@@ -151,7 +166,8 @@ class FileSection(models.Model):
                                                null=True,
                                                limit_choices_to={'available': True})
 
-    content = models.CharField(max_length=1000000)
+    begin = models.IntegerField()
+    end = models.IntegerField()
     is_subsection = models.BooleanField(default=False)
     parent_section = models.ForeignKey('self',
                                        on_delete=models.CASCADE,
@@ -204,38 +220,38 @@ class FileSection(models.Model):
         else:
             return str(self.section_category)
 
-    def get_content(self, ident):
-        tab = "    "
-        string = ident + "{ Section      " + self.get_raw_name() + "\n" +\
-                 ident + "  Description: "
-        description = ["None"]
-        if self.description is not None:
-            description = self.description.splitlines()
-        string += description[0] + "\n"
-        for line in description[1:]:
-            string += ident + "               " + line + "\n"
-
-        string += ident + "  Category:    " + str(self.section_category) + "\n" +\
-                  ident + "  Status:      " + str(self.section_status) + "\n" +\
-                  ident + "  Status data: "
-        status_data = ["No data"]
-        if self.section_status_data is not None:
-            status_data = self.section_status_data.content.splitlines()
-        string += status_data[0] + "\n"
-        for line in status_data[1:]:
-            string += ident + "               " + line + "\n"
-
-        string += ident + "  Owner:       " + str(self.section_status_data.user) + " }\n"
-        ident += tab
-        for line in self.content.splitlines():
-            string += ident + line + "\n"
-
-        subsections = FileSection.objects.filter(parent_section=self, available=True)
-        if subsections.exists():
-            string += "\n"
-            for section in subsections:
-                string += section.get_content(ident) + "\n"
-        return string
+    # def get_content(self, ident):
+    #     tab = "    "
+    #     string = ident + "{ Section      " + self.get_raw_name() + "\n" +\
+    #              ident + "  Description: "
+    #     description = ["None"]
+    #     if self.description is not None:
+    #         description = self.description.splitlines()
+    #     string += description[0] + "\n"
+    #     for line in description[1:]:
+    #         string += ident + "               " + line + "\n"
+    #
+    #     string += ident + "  Category:    " + str(self.section_category) + "\n" +\
+    #               ident + "  Status:      " + str(self.section_status) + "\n" +\
+    #               ident + "  Status data: "
+    #     status_data = ["No data"]
+    #     if self.section_status_data is not None:
+    #         status_data = self.section_status_data.content.splitlines()
+    #     string += status_data[0] + "\n"
+    #     for line in status_data[1:]:
+    #         string += ident + "               " + line + "\n"
+    #
+    #     string += ident + "  Owner:       " + str(self.section_status_data.user) + " }\n"
+    #     ident += tab
+    #     for line in self.content.splitlines():
+    #         string += ident + line + "\n"
+    #
+    #     subsections = FileSection.objects.filter(parent_section=self, available=True)
+    #     if subsections.exists():
+    #         string += "\n"
+    #         for section in subsections:
+    #             string += section.get_content(ident) + "\n"
+    #     return string
 
     def __str__(self):
         section = self
