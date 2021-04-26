@@ -41,6 +41,17 @@ class Directory(models.Model):
         verbose_name_plural = "Directories"
 
 
+class Prover(models.Model):
+    name = models.TextField(max_length=50)
+    arg = models.TextField(max_length=50)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    modify_date = models.DateTimeField(auto_now=True)
+    available = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+
 class File(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=3000, blank=True, null=True)
@@ -60,6 +71,11 @@ class File(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     modify_date = models.DateTimeField(auto_now=True)
     available = models.BooleanField(default=True)
+    prover = models.ForeignKey(Prover,
+                               on_delete=models.SET_NULL,
+                               blank=True,
+                               null=True,
+                               limit_choices_to={'available': True})
 
     def __str__(self):
         string = self.name
@@ -76,28 +92,6 @@ class File(models.Model):
         super().save()
 
     def get_content(self):
-        # sections = FileSection.objects.filter(parent_file=self, available=True)
-        # last_modified = self.modify_date
-        #
-        # for section in sections:
-        #     if section.modify_date > last_modified:
-        #         last_modified = section.modify_date
-        #     if section.creation_date > last_modified:
-        #         last_modified = section.creation_date
-        #
-        # string = "/* Author:        " + str(self.owner) +\
-        #          "\n * Created at:    " + str(self.creation_date) +\
-        #          "\n * Last modified: " + str(last_modified) +\
-        #          "\n * Description:   "
-        # description = ["None"]
-        # if self.description is not None:
-        #     description = self.description.splitlines()
-        # string += description[0] + "\n"
-        # for line in description[1:]:
-        #     string += " *                " + line + "\n"
-        # string += " */\n"
-        # for section in sections:
-        #     string = string + section.get_content("") + "\n"
         file = self.content
         file.open("r")
         lines = file.readlines()
@@ -176,8 +170,6 @@ class FileSection(models.Model):
                                        limit_choices_to={'available': True})
     parent_file = models.ForeignKey(File,
                                     on_delete=models.CASCADE,
-                                    blank=True,
-                                    null=True,
                                     limit_choices_to={'available': True})
 
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -191,15 +183,13 @@ class FileSection(models.Model):
         return obj.parent_file
 
     def save(self, *args, **kwargs):
-        if self.parent_file is not None and self.parent_section is not None:
-            raise Exception('Section has both file and section as parents.')
-
         if self.is_subsection:
             if self.parent_section is None:
                 raise Exception("Subsection doesn't have a section parent.")
         else:
-            if self.parent_file is None:
-                raise Exception("Main Section doesn't have a file parent.")
+            if self.parent_section is not None:
+                raise Exception("A section, which is not a subsection, has a section parent.")
+
         super().save(args, kwargs)
 
     def delete(self):

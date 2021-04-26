@@ -23,6 +23,7 @@ body {
     --invalid: red;
     --unknown: yellow;
     --valid: limegreen;
+    --timeout: magenta;
 
     --bold-color: darkblue;
     --light-color: gray;
@@ -46,6 +47,7 @@ body {
     --invalid: red;
     --unknown: yellow;
     --valid: limegreen;
+    --timeout: magenta;
 
     --bold-color: lime;
     --light-color: #92E5A1;
@@ -76,6 +78,10 @@ body {
 
 .Valid {
     background: var(--valid);
+}
+
+.Timeout {
+    background: var(--timeout);
 }
 
 .outer {

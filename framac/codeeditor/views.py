@@ -33,7 +33,7 @@ def get_separator():
     return "------------------------------------------------------------"
 
 
-def parse_section(string):
+def parse_section(string, file):
     filesection = None
     proved_status = ""
     lines = string.splitlines()
@@ -46,7 +46,7 @@ def parse_section(string):
 
         if len(number_match) != 0:
             line_number = int(number_match[0])
-            filesection = get_filesection(line_number)
+            filesection = get_filesection(line_number, file)
 
         proved_match = re.findall(r"^Prover [\S]+ returns ([\S]+)", proved_status_line)
         if len(proved_match) != 0:
@@ -58,8 +58,11 @@ def parse_section(string):
     return result, filesection, proved_status  # (section string, FileSection matching this section, status)
 
 
-def get_filesection(line_number):
-    sections = models.FileSection.objects.filter(available=True, begin__lte=line_number, end__gte=line_number)
+def get_filesection(line_number, file):
+    sections = models.FileSection.objects.filter(available=True,
+                                                 parent_file=file,
+                                                 begin__lte=line_number,
+                                                 end__gte=line_number)
     if not sections.exists():
         return None
     else:
@@ -70,7 +73,7 @@ def get_filesection(line_number):
         return best_section.get_hierarchy_name()
 
 
-def parse_frama_output(raw):
+def parse_frama_output(raw, file):
     separator = get_separator()
     sep_len = len(separator)
     sections = []
@@ -78,12 +81,12 @@ def parse_frama_output(raw):
     last_index = raw.find(separator)
     while last_index != -1:
         string = raw[:last_index]
-        sections.append(parse_section(string))
+        sections.append(parse_section(string, file))
 
         raw = raw[last_index + sep_len:]
         last_index = raw.find(separator)
 
-    sections.append(parse_section(raw))
+    sections.append(parse_section(raw, file))
     return sections
 
 
@@ -106,7 +109,7 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
             ctx['error_msg'] = "Frama encountered an error"
         else:
             result = result[1]
-            ctx['sections'] = parse_frama_output(result)
+            ctx['sections'] = parse_frama_output(result, file)
             ctx['separator'] = get_separator()
 
         return render(request, 'codeeditor/main.html', ctx)
@@ -151,6 +154,9 @@ class AddSectionView(View):
             if form.is_valid():
                 status_data = models.SectionStatusData(content=form.cleaned_data['section_status_content'],
                                                        user=request.user)
+                file = form.cleaned_data['parent_file']
+                if file is None:
+                    file = form.cleaned_data['parent_section'].parent_file
                 section = models.FileSection(name=form.cleaned_data['name'],
                                              description=form.cleaned_data['description'],
                                              section_category=form.cleaned_data['section_category'],
@@ -160,7 +166,7 @@ class AddSectionView(View):
                                              end=form.cleaned_data['end'],
                                              is_subsection=form.cleaned_data['is_subsection'],
                                              parent_section=form.cleaned_data['parent_section'],
-                                             parent_file=form.cleaned_data['parent_file'])
+                                             parent_file=file)
                 status_data.save()
                 try:
                     section.save()
