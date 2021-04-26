@@ -20,6 +20,9 @@ body {
     --tab-active: #FDFD96;          /* pastel yellow */
     --tab-data: #F5D6F4;            /* light pink */
     --link: blue;
+    --invalid: red;
+    --unknown: yellow;
+    --valid: limegreen;
 
     --bold-color: darkblue;
     --light-color: gray;
@@ -40,6 +43,9 @@ body {
     --tab-active: lime;             /* lime */
     --tab-data: #020204;            /* black */
     --link: yellow;
+    --invalid: red;
+    --unknown: yellow;
+    --valid: limegreen;
 
     --bold-color: lime;
     --light-color: #92E5A1;
@@ -54,6 +60,22 @@ body {
 .color2 ::selection {
     color: white;
     background: lime;
+}
+
+.status {
+    width: 100%;
+}
+
+.Invalid {
+    background: var(--invalid);
+}
+
+.Unknown {
+    background: var(--unknown);
+}
+
+.Valid {
+    background: var(--valid);
 }
 
 .outer {
@@ -204,6 +226,27 @@ nav.tabs > ul > li.active {
 
 .light {
     color: var(--light-color);
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    width: 150%;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+    position: absolute;
+    top: -22px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }
 
 /* Large viewport */

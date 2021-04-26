@@ -255,10 +255,18 @@ class FileSection(models.Model):
 
     def __str__(self):
         section = self
-        result = self.get_raw_name() + " ))"
+        result = self.get_raw_name() + " )"
 
         while section.is_subsection:
             section = section.parent_section
             result = section.get_raw_name() + "-->" + result
-        result = "(( " + str(section.parent_file) + ":" + result
+        result = "( " + str(section.parent_file) + ":" + result
+        return result
+
+    def get_hierarchy_name(self):
+        section = self
+        result = self.get_raw_name()
+        while section.is_subsection:
+            section = section.parent_section
+            result = section.get_raw_name() + "-->" + result
         return result

@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import View
 
+import re
+
 from . import models
 from . import forms
 
@@ -27,6 +29,64 @@ class CodeEditorViewBlank(View):
         return render(request, 'codeeditor/index.html', self.get_context())
 
 
+def get_separator():
+    return "------------------------------------------------------------"
+
+
+def parse_section(string):
+    filesection = None
+    proved_status = ""
+    lines = string.splitlines()
+    if string[2:6] == "Goal":
+        lines_len = len(lines)
+        line_number_line = lines[2]
+        proved_status_line = lines[lines_len - 2]
+
+        number_match = re.findall(r"line ([\d]+)\):$", line_number_line)
+
+        if len(number_match) != 0:
+            line_number = int(number_match[0])
+            filesection = get_filesection(line_number)
+
+        proved_match = re.findall(r"^Prover [\S]+ returns ([\S]+)", proved_status_line)
+        if len(proved_match) != 0:
+            proved_status = proved_match[0]
+
+    result = []
+    for line in lines:
+        result.append(line)
+    return result, filesection, proved_status  # (section string, FileSection matching this section, status)
+
+
+def get_filesection(line_number):
+    sections = models.FileSection.objects.filter(available=True, begin__lte=line_number, end__gte=line_number)
+    if not sections.exists():
+        return None
+    else:
+        best_section = None  # best section is the one which is the shortest (the most specific)
+        for section in sections:
+            if best_section is None or best_section.end - best_section.begin > section.end - section.begin:
+                best_section = section
+        return best_section.get_hierarchy_name()
+
+
+def parse_frama_output(raw):
+    separator = get_separator()
+    sep_len = len(separator)
+    sections = []
+
+    last_index = raw.find(separator)
+    while last_index != -1:
+        string = raw[:last_index]
+        sections.append(parse_section(string))
+
+        raw = raw[last_index + sep_len:]
+        last_index = raw.find(separator)
+
+    sections.append(parse_section(raw))
+    return sections
+
+
 class CodeEditorViewSelected(CodeEditorViewBlank):
     def get(self, request, *args, **kwargs):
         file_id = kwargs['id']
@@ -42,7 +102,12 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
         # Focus on program elements view
         framac_call = 'frama-c -wp -wp-print ' + 'upload/' + file.content.name
         result = subprocess.getstatusoutput(framac_call)
-        ctx['focuslines'] = result[1]
+        if result[0] != 0:
+            ctx['error_msg'] = "Frama encountered an error"
+        else:
+            result = result[1]
+            ctx['sections'] = parse_frama_output(result)
+            ctx['separator'] = get_separator()
 
         return render(request, 'codeeditor/main.html', ctx)
 
@@ -91,7 +156,8 @@ class AddSectionView(View):
                                              section_category=form.cleaned_data['section_category'],
                                              section_status=form.cleaned_data['section_status'],
                                              section_status_data=status_data,
-                                             content=form.cleaned_data['content'],
+                                             begin=form.cleaned_data['begin'],
+                                             end=form.cleaned_data['end'],
                                              is_subsection=form.cleaned_data['is_subsection'],
                                              parent_section=form.cleaned_data['parent_section'],
                                              parent_file=form.cleaned_data['parent_file'])
