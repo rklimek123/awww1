@@ -81,3 +81,19 @@ class DeleteDirectoryForm(forms.Form):
     directory = forms.ModelChoiceField(label='Directory to delete',
                                        queryset=models.Directory.objects.filter(available=True),
                                        empty_label='No directory chosen')
+
+
+class ChooseProverForm(forms.Form):
+    prover = forms.ModelChoiceField(label='Choose a prover',
+                                    queryset=models.Prover.objects.filter(available=True),
+                                    empty_label='Default prover',
+                                    required=False)
+
+
+class ChooseVcForm(forms.Form):
+    vc = forms.CharField(label='Enter vcs',
+                         max_length=1000,
+                         required=False)
+
+    rte = forms.BooleanField(label='Enable runtime guard verification conditions (-wp-rte)',
+                             required=False)

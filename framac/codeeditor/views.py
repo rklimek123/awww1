@@ -12,7 +12,7 @@ from . import forms
 
 
 class CodeEditorViewBlank(View):
-    def get_context(self):
+    def get_context(self, request, *args, **kwargs):
         ctx = {}
         ctx['inroot_dirs'] = models.Directory.objects.filter(parent=None, available=True).order_by('name')
         ctx['inroot_files'] = models.File.objects.filter(directory=None, available=True).order_by('name')
@@ -25,8 +25,9 @@ class CodeEditorViewBlank(View):
             ctx['in_files'][direct] = children_files
         return ctx
 
-    def get(self, request):
-        return render(request, 'codeeditor/index.html', self.get_context())
+    def get(self, request, *args, **kwargs):
+        ctx = self.get_context(request, *args, **kwargs)
+        return render(request, 'codeeditor/index.html', ctx)
 
 
 def get_separator():
@@ -89,11 +90,23 @@ def parse_frama_output(raw, file):
     sections.append(parse_section(raw, file))
     return sections
 
+def get_result_tab(file):
+    framac_call = 'frama-c -wp -wp-log="r:result.txt" upload/' + file.content.name
 
-class CodeEditorViewSelected(CodeEditorViewBlank):
-    def get(self, request, *args, **kwargs):
+    result = subprocess.getstatusoutput(framac_call)
+    if result[0] != 0:
+        return "Frama encountered an error\n" + result[1], 1
+    else:
+        result_file = open('result.txt', "r")
+        result = result_file.readlines()
+        result_file.close()
+        return result, 0
+
+
+class CodeEditorPreVerification(CodeEditorViewBlank):
+    def get_context(self, request, *args, **kwargs):
+        ctx = super().get_context(request, *args, **kwargs)
         file_id = kwargs['id']
-        ctx = self.get_context()
         file = get_object_or_404(models.File, pk=file_id, available=True)
 
         # Filesystem view
@@ -101,17 +114,80 @@ class CodeEditorViewSelected(CodeEditorViewBlank):
 
         # Code edit (main) view
         ctx['filelines'] = file.get_content()
+        ctx['tab'] = int(request.GET.get('tab', "2"))
+        ctx['result_tab'] = get_result_tab(file)
+        return ctx
+
+    def get(self, request, *args, **kwargs):
+        ctx = self.get_context(request, *args, **kwargs)
+        ctx['provers_form'] = forms.ChooseProverForm()
+        ctx['vcs_form'] = forms.ChooseVcForm()
+        return render(request, 'codeeditor/main.html', ctx)
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            prover = request.POST.get('prover', None)
+            vc = request.POST.get('vc', None)
+            rte = request.POST.get('rte', None)
+            file = get_object_or_404(models.File, pk=kwargs['id'], available=True)
+
+            if prover is not None:
+                if prover == '':
+                    file.prover = None
+                else:
+                    file.prover = models.Prover.objects.get(pk=int(prover))
+            elif vc is not None:
+                file.vcs = vc
+
+                if rte is not None:
+                    file.rte = True
+                else:
+                    file.rte = False
+            else:
+                raise Exception("503 - Bad Request (POST)")
+            file.save()
+            return HttpResponseRedirect(reverse('noframa', kwargs={'id': file.pk}))
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+
+class CodeEditorViewSelected(CodeEditorPreVerification):
+    def get_context(self, request, *args, **kwargs):
+        ctx = super().get_context(request, *args, **kwargs)
+        ctx['separator'] = get_separator()
+
+        file = ctx['selected_file']
 
         # Focus on program elements view
-        framac_call = 'frama-c -wp -wp-print ' + 'upload/' + file.content.name
+        if int(request.GET.get('custom', 0)) == 1:
+            framac_call = 'frama-c -wp -wp-print -wp-prover '
+            if file.prover is None:
+                framac_call += " alt-ergo"
+            else:
+                framac_call += " " + file.prover.arg
+
+            if file.vcs is not None and file.vcs != '':
+                framac_call += ' -wp-prop="' + file.vcs + '"'
+
+            if file.rte is not None and file.rte:
+                framac_call += " -wp-rte"
+
+            framac_call += " upload/" + file.content.name
+        else:
+            framac_call = 'frama-c -wp -wp-print upload/' + file.content.name
+
         result = subprocess.getstatusoutput(framac_call)
         if result[0] != 0:
-            ctx['error_msg'] = "Frama encountered an error"
+            ctx['error_msg'] = "Frama encountered an error\n" + result[1]
         else:
             result = result[1]
             ctx['sections'] = parse_frama_output(result, file)
-            ctx['separator'] = get_separator()
+        return ctx
 
+    def get(self, request, *args, **kwargs):
+        ctx = self.get_context(request, *args, **kwargs)
+        print(request.GET)
+        ctx['tab'] = 2
         return render(request, 'codeeditor/main.html', ctx)
 
 
@@ -137,7 +213,7 @@ class AddFileView(View):
             else:
                 return render(request, 'codeeditor/form.html', {'form': form, 'action': reverse('addfile')})
         else:
-            return render(request, 'registration/login.html')
+            return HttpResponseRedirect(reverse('login'))
 
 
 class AddSectionView(View):
@@ -183,7 +259,7 @@ class AddSectionView(View):
                               {'form': form,
                                'action': reverse('addsection')})
         else:
-            return render(request, 'registration/login.html')
+            return HttpResponseRedirect(reverse('login'))
 
 
 class AddDirectoryView(View):
@@ -210,7 +286,7 @@ class AddDirectoryView(View):
                               {'form': form,
                                'action': reverse('adddirectory')})
         else:
-            return render(request, 'registration/login.html')
+            return HttpResponseRedirect(reverse('login'))
 
 
 class DeleteFileView(View):
@@ -234,7 +310,7 @@ class DeleteFileView(View):
                               {'form': form,
                                'action': reverse('deletefile')})
         else:
-            return render(request, 'registration/login.html')
+            return HttpResponseRedirect(reverse('login'))
 
 
 class DeleteDirectoryView(View):
@@ -258,4 +334,4 @@ class DeleteDirectoryView(View):
                               {'form': form,
                                'action': reverse('deletedirectory')})
         else:
-            return render(request, 'registration/login.html')
+            return HttpResponseRedirect(reverse('login'))

@@ -76,6 +76,8 @@ class File(models.Model):
                                blank=True,
                                null=True,
                                limit_choices_to={'available': True})
+    rte = models.BooleanField(default=False)
+    vcs = models.CharField(max_length=1000, blank=True, null=True)
 
     def __str__(self):
         string = self.name
@@ -100,12 +102,6 @@ class File(models.Model):
         for line in lines:
             result.append(line[:len(line) - 1])  # .readlines() puts a '\n' at the end of each line
         return result
-
-    def save(self):
-        if self.directory is not None:
-            path = self.directory.get_breadcrumbs()[2:]
-            self.content.name = path + self.content.name
-        super().save()
 
 
 class SectionCategory(models.Model):

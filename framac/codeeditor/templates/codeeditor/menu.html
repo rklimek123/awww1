@@ -1,4 +1,4 @@
-<div>
+<div class="silent-links">
     Add
     <div class="dropdown">
         <a href="{% url 'addfile' %}">File</a>
@@ -6,13 +6,13 @@
         <a href="{% url 'adddirectory' %}">Directory</a>
     </div>
 </div>
-<div>
+<div class="silent-links">
     Delete
     <div class="dropdown">
         <a href="{% url 'deletefile' %}">File</a>
         <a href="{% url 'deletedirectory' %}">Directory</a>
     </div>
 </div>
-<div>
-    Re-verify
+<div class="silent-links">
+    {% if selected_file %}<a href="{% url 'main' id=selected_file.pk %}?custom=1">Re-verify</a>{% endif %}
 </div>

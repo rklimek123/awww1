@@ -3,3 +3,4 @@ env/*
 *.pyc
 *.sqlite3
 framac/upload/*
+framac/result.txt

@@ -1,0 +1,7 @@
+{% if result_tab.1 == 0 %}
+{% for line in result_tab.0 %}
+<code>{{ line }}</code><br>
+{% endfor %}
+{% else %}
+{{ result_tab.0 }}
+{% endif %}

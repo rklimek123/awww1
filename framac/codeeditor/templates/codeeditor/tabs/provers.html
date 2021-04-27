@@ -1,0 +1,5 @@
+<form enctype="multipart/form-data" action="{% url 'noframa' id=selected_file.pk %}" method="POST">
+    {% csrf_token %}
+    {{ provers_form.as_ul }}
+    <input type="submit" value="OK">
+</form>

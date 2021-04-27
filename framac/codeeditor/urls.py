@@ -5,6 +5,7 @@ from django.contrib.auth import views as login_views
 
 urlpatterns = [
     path('', views.CodeEditorViewBlank.as_view(), name='index'),
+    path('noframa/<int:id>', views.CodeEditorPreVerification.as_view(), name='noframa'),
     path('file/<int:id>', views.CodeEditorViewSelected.as_view(), name='main'),
 
     path('addfile/', views.AddFileView.as_view(), name='addfile'),

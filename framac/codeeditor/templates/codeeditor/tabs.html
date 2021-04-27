@@ -1,19 +1,23 @@
 <nav class="tabs">
     <ul>
-        <li>
-            PROVERS
+        <li {% if tab == 0 %}class="active"{% endif %}>{% if selected_file %}
+            <a href="{% url 'noframa' id=selected_file.pk %}?tab=0">PROVERS</a>{% endif %}
         </li>
-        <li class="active">
-            VCs
+        <li {% if tab == 1 %}class="active"{% endif %}>{% if selected_file %}
+            <a href="{% url 'noframa' id=selected_file.pk %}?tab=1">VCs</a>{% endif %}
         </li>
-        <li>
-            RESULT
+        <li {% if tab == 2 %}class="active"{% endif %}>{% if selected_file %}
+            <a href="{% url 'noframa' id=selected_file.pk %}?tab=2">RESULT</a>{% endif %}
         </li>
     </ul>
 </nav>
 <div class="tab-data">
-<pre>
-1 2 3 4 5 6 7 8
-Process exited with code 0.
-</pre>
+{% if selected_file %}
+{% if tab == 0 %}   {% include 'codeeditor/tabs/provers.html' %}
+{% elif tab == 1 %} {% include 'codeeditor/tabs/vcs.html' %}
+{% elif tab == 2 %} {% include 'codeeditor/tabs/result.html' %}
+{% else %}
+404 - Tab doesn't exist
+{% endif %}
+{% endif %}
 </div>

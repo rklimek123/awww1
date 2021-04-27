@@ -109,7 +109,7 @@ body {
     width: 100%;
 }
 
-.dropdown a {
+.silent-links a {
     color: inherit;
 }
 
@@ -212,7 +212,6 @@ nav.tabs > ul > li {
     border-right: 20px solid transparent;
     height: 0;
     width: 90px;
-    cursor: pointer;
 }
 
 nav.tabs > ul > li:hover {
@@ -221,6 +220,11 @@ nav.tabs > ul > li:hover {
 
 nav.tabs > ul > li.active {
     border-bottom-color: var(--tab-active);
+}
+
+nav.tabs > ul > li > a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .tab-data {
