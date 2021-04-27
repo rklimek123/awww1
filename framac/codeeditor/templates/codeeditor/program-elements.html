@@ -1,7 +1,11 @@
 {% if error_msg %}
     {{ error_msg }}
 {% else %}
-{% if sections %}
+{% if first_section %}
+<pre>
+{% for line, status in first_section %}
+<code class="status {{ status }}">{{ line }}</code>{% endfor %}
+</pre>
 {% for lines, section, status in sections %}
 <div class="tooltip">
     {% if section %}

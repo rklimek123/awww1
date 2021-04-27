@@ -74,21 +74,49 @@ def get_filesection(line_number, file):
         return best_section.get_hierarchy_name()
 
 
+def parse_first_section(string):
+    lines = []
+    raw_lines = string.splitlines()
+
+    for raw in raw_lines:
+        status = ""
+        match_goal = re.findall(r"\[wp] \[[\S]+] Goal", raw)
+        if len(match_goal) != 0:
+            match_status = re.findall(r" : ([\S]+)", raw)
+
+            if len(match_status) != 0:
+                status = match_status[0]
+        lines.append((raw, status))
+    return lines
+
+
 def parse_frama_output(raw, file):
     separator = get_separator()
     sep_len = len(separator)
     sections = []
 
     last_index = raw.find(separator)
-    while last_index != -1:
-        string = raw[:last_index]
-        sections.append(parse_section(string, file))
 
+    if last_index == -1:
+        string = raw
+    else:
+        string = raw[:last_index]
+    first_section = parse_first_section(string)
+
+    if last_index != -1:
         raw = raw[last_index + sep_len:]
         last_index = raw.find(separator)
 
-    sections.append(parse_section(raw, file))
-    return sections
+        while last_index != -1:
+            string = raw[:last_index]
+            sections.append(parse_section(string, file))
+
+            raw = raw[last_index + sep_len:]
+            last_index = raw.find(separator)
+
+        sections.append(parse_section(raw, file))
+    return first_section, sections
+
 
 def get_result_tab(file):
     framac_call = 'frama-c -wp -wp-log="r:result.txt" upload/' + file.content.name
@@ -114,14 +142,18 @@ class CodeEditorPreVerification(CodeEditorViewBlank):
 
         # Code edit (main) view
         ctx['filelines'] = file.get_content()
-        ctx['tab'] = int(request.GET.get('tab', "2"))
-        ctx['result_tab'] = get_result_tab(file)
+
+        # Tabs
+        ctx['tab'] = int(request.GET.get('tab', "0"))
+        ctx['provers_form'] = forms.ChooseProverForm()
+        ctx['vcs_form'] = forms.ChooseVcForm()
+        if ctx['tab'] == 2:
+            ctx['result_tab'] = get_result_tab(ctx['selected_file'])
         return ctx
 
     def get(self, request, *args, **kwargs):
         ctx = self.get_context(request, *args, **kwargs)
-        ctx['provers_form'] = forms.ChooseProverForm()
-        ctx['vcs_form'] = forms.ChooseVcForm()
+
         return render(request, 'codeeditor/main.html', ctx)
 
     def post(self, request, *args, **kwargs):
@@ -160,7 +192,7 @@ class CodeEditorViewSelected(CodeEditorPreVerification):
 
         # Focus on program elements view
         if int(request.GET.get('custom', 0)) == 1:
-            framac_call = 'frama-c -wp -wp-print -wp-prover '
+            framac_call = 'frama-c -wp -wp-prover '
             if file.prover is None:
                 framac_call += " alt-ergo"
             else:
@@ -181,13 +213,13 @@ class CodeEditorViewSelected(CodeEditorPreVerification):
             ctx['error_msg'] = "Frama encountered an error\n" + result[1]
         else:
             result = result[1]
-            ctx['sections'] = parse_frama_output(result, file)
+            frama_out = parse_frama_output(result, file)
+            ctx['first_section'] = frama_out[0]
+            ctx['sections'] = frama_out[1]
         return ctx
 
     def get(self, request, *args, **kwargs):
         ctx = self.get_context(request, *args, **kwargs)
-        print(request.GET)
-        ctx['tab'] = 2
         return render(request, 'codeeditor/main.html', ctx)
 
 
