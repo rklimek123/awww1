@@ -34,6 +34,9 @@ class Directory(models.Model):
         files = File.objects.filter(directory=self, available=True)
         for file in files:
             file.mark_inavailable()
+        subdirectories = Directory.objects.filter(parent=self, available=True)
+        for dire in subdirectories:
+            dire.mark_inavailable()
         self.available = False
         self.save()
 
@@ -195,8 +198,6 @@ class FileSection(models.Model):
 
     def mark_inavailable(self):
         subsections = FileSection.objects.filter(parent_section=self, available=True)
-        for section in subsections:
-            section.mark_inavailable()
         self.available = False
         self.save()
 
