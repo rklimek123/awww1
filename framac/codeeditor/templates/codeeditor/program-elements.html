@@ -6,14 +6,14 @@
 {% for line, status in first_section %}
 <code class="status {{ status }}">{{ line }}</code>{% endfor %}
 </pre>
-{% for lines, section, status in sections %}
+{% for lines, section, status, identifier in sections %}
 <div class="tooltip">
     {% if section %}
     <div class="tooltiptext">
         {{ section }}
     </div>
     {% endif %}
-<pre class="status {{ status }}">
+<pre id="{{ identifier }}" onclick="collapse()" class="status {{ status }}">
 {% for line in lines %}
 <code>{{ line }}</code>{% endfor %}
 </pre>

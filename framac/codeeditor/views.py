@@ -34,7 +34,7 @@ def get_separator():
     return "------------------------------------------------------------"
 
 
-def parse_section(string, file):
+def parse_section(string, file, id):
     filesection = None
     proved_status = ""
     lines = string.splitlines()
@@ -56,7 +56,7 @@ def parse_section(string, file):
     result = []
     for line in lines:
         result.append(line)
-    return result, filesection, proved_status  # (section string, FileSection matching this section, status)
+    return result, filesection, proved_status, "section" + str(id)  # (section string, FileSection matching this section, status)
 
 
 def get_filesection(line_number, file):
@@ -94,6 +94,7 @@ def parse_frama_output(raw, file):
     separator = get_separator()
     sep_len = len(separator)
     sections = []
+    id = 0;
 
     last_index = raw.find(separator)
 
@@ -109,12 +110,14 @@ def parse_frama_output(raw, file):
 
         while last_index != -1:
             string = raw[:last_index]
-            sections.append(parse_section(string, file))
+            sections.append(parse_section(string, file, id))
+            id += 1
 
             raw = raw[last_index + sep_len:]
             last_index = raw.find(separator)
 
-        sections.append(parse_section(raw, file))
+        sections.append(parse_section(raw, file, id))
+        id += 1
     return first_section, sections
 
 

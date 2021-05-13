@@ -207,39 +207,6 @@ class FileSection(models.Model):
         else:
             return str(self.section_category)
 
-    # def get_content(self, ident):
-    #     tab = "    "
-    #     string = ident + "{ Section      " + self.get_raw_name() + "\n" +\
-    #              ident + "  Description: "
-    #     description = ["None"]
-    #     if self.description is not None:
-    #         description = self.description.splitlines()
-    #     string += description[0] + "\n"
-    #     for line in description[1:]:
-    #         string += ident + "               " + line + "\n"
-    #
-    #     string += ident + "  Category:    " + str(self.section_category) + "\n" +\
-    #               ident + "  Status:      " + str(self.section_status) + "\n" +\
-    #               ident + "  Status data: "
-    #     status_data = ["No data"]
-    #     if self.section_status_data is not None:
-    #         status_data = self.section_status_data.content.splitlines()
-    #     string += status_data[0] + "\n"
-    #     for line in status_data[1:]:
-    #         string += ident + "               " + line + "\n"
-    #
-    #     string += ident + "  Owner:       " + str(self.section_status_data.user) + " }\n"
-    #     ident += tab
-    #     for line in self.content.splitlines():
-    #         string += ident + line + "\n"
-    #
-    #     subsections = FileSection.objects.filter(parent_section=self, available=True)
-    #     if subsections.exists():
-    #         string += "\n"
-    #         for section in subsections:
-    #             string += section.get_content(ident) + "\n"
-    #     return string
-
     def __str__(self):
         section = self
         result = self.get_raw_name() + " )"
