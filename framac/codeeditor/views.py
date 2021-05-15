@@ -94,7 +94,7 @@ def parse_frama_output(raw, file):
     separator = get_separator()
     sep_len = len(separator)
     sections = []
-    id = 0;
+    id = 0
 
     last_index = raw.find(separator)
 
@@ -219,6 +219,7 @@ class CodeEditorViewSelected(CodeEditorPreVerification):
             frama_out = parse_frama_output(result, file)
             ctx['first_section'] = frama_out[0]
             ctx['sections'] = frama_out[1]
+
         return ctx
 
     def get(self, request, *args, **kwargs):

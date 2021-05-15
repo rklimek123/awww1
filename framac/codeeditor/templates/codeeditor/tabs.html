@@ -1,17 +1,17 @@
-<nav class="tabs">
+<nav id="tabs" class="tabs">
     <ul>
         <li {% if tab == 0 %}class="active"{% endif %}>{% if selected_file %}
-            <a href="{% url 'noframa' id=selected_file.pk %}?tab=0">PROVERS</a>{% endif %}
+            <a onclick="change_tab({{ selected_file.pk }}, 0)">PROVERS</a>{% endif %}
         </li>
         <li {% if tab == 1 %}class="active"{% endif %}>{% if selected_file %}
-            <a href="{% url 'noframa' id=selected_file.pk %}?tab=1">VCs</a>{% endif %}
+            <a onclick="change_tab({{ selected_file.pk }}, 1)">VCs</a>{% endif %}
         </li>
         <li {% if tab == 2 %}class="active"{% endif %}>{% if selected_file %}
-            <a href="{% url 'noframa' id=selected_file.pk %}?tab=2">RESULT</a>{% endif %}
+            <a onclick="change_tab({{ selected_file.pk }}, 2)">RESULT</a>{% endif %}
         </li>
     </ul>
 </nav>
-<div class="tab-data">
+<div id="tab-data" class="tab-data">
 {% if selected_file %}
 {% if tab == 0 %}   {% include 'codeeditor/tabs/provers.html' %}
 {% elif tab == 1 %} {% include 'codeeditor/tabs/vcs.html' %}

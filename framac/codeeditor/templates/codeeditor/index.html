@@ -1,21 +1,27 @@
 {% extends './authlock.html' %}
+{% load static %}
+{% block scripts %}
+    <script src="{% static 'codeeditor/js/program-elements.js' %}"></script>
+    <script src="{% static 'codeeditor/js/ajax.js' %}"></script>
+    <script src="{% static 'codeeditor/js/tabs.js' %}"></script>
+{% endblock %}
 {% block content %}
 <div class="color1 outer">
-    <header class="menu">
+    <header id="menu" class="menu">
         {% include './menu.html' %}
     </header>
     <div class="plane">
-        <aside class="files">
+        <aside id="files" class="files">
             {% include './files.html' %}
         </aside>
-        <div class="main">
+        <div id="main" class="main">
             {% block main %}
             {% endblock %}
         </div>
-        <div class="program-elements">
+        <div id="program-elements" class="program-elements">
             {% include './program-elements.html' %}
         </div>
-        <div class="bottom">
+        <div id="bottom" class="bottom">
             {% include './tabs.html' %}
         </div>
     </div>

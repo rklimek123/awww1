@@ -1,12 +1,3 @@
-Object.size = function(obj) {
-  var size = 0,
-    key;
-  for (key in obj) {
-    if (obj.hasOwnProperty(key)) size++;
-  }
-  return size;
-};
-
 var previousContent = {};
 var isCollapsed = {};
 
@@ -38,4 +29,9 @@ function collapse() {
         me.innerHTML = "↓ Line: " + line + " ↓";
     else
         me.innerHTML = previousContent[me_id];
+}
+
+function reset_collapse() {
+    previousContent = {};
+    isCollapsed = {};
 }

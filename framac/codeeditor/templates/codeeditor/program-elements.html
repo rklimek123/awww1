@@ -13,7 +13,7 @@
         {{ section }}
     </div>
     {% endif %}
-<pre id="{{ identifier }}" onclick="collapse()" class="status {{ status }}">
+<pre id="{{ file_id }}$frama@{{ identifier }}" onclick="collapse()" class="status {{ status }}">
 {% for line in lines %}
 <code>{{ line }}</code>{% endfor %}
 </pre>
