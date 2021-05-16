@@ -16,3 +16,6 @@
 <div class="silent-links">
     {% if selected_file %}<a onclick="reverify('{% url 'main' id=selected_file.pk %}?custom=1', {{ selected_file.pk }})">Re-verify</a>{% endif %}
 </div>
+<div class="silent-links">
+    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i></a>
+</div>
