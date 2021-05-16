@@ -14,5 +14,5 @@
     </div>
 </div>
 <div class="silent-links">
-    {% if selected_file %}<a href="{% url 'main' id=selected_file.pk %}?custom=1">Re-verify</a>{% endif %}
+    {% if selected_file %}<a onclick="reverify('{% url 'main' id=selected_file.pk %}?custom=1', {{ selected_file.pk }})">Re-verify</a>{% endif %}
 </div>

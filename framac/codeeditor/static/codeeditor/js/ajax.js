@@ -27,7 +27,6 @@ function reload_page(url, file_id) {
             replace(resp, "main");
             replace(resp, "menu");
             replace(resp, "bottom");
-            console.log(resp.getElementById('bottom'));
 
             document.getElementById("program-elements").innerHTML =
                 loading_spinner;
@@ -52,6 +51,27 @@ function reload_program_elements(url, file_id) {
         }
     }
 
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+
+function reverify(url, file_id) {
+    file_id *= -1;
+    wanted_file = file_id;
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+            const resp = parser.parseFromString(this.responseText, "text/html");
+            if (wanted_file != file_id) return;
+            replace(resp,"program-elements");
+            reset_collapse();
+        }
+        if (this.readyState == XMLHttpRequest.OPENED) {
+            document.getElementById("program-elements").innerHTML =
+                loading_spinner;
+        }
+    };
     xhttp.open("GET", url, true);
     xhttp.send();
 }
