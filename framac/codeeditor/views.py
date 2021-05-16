@@ -245,7 +245,7 @@ class AddFileView(View):
                                    directory=form.cleaned_data['directory'],
                                    owner=request.user)
                 file.save()
-                return HttpResponseRedirect(reverse('main', kwargs={'id': file.pk}))
+                return HttpResponseRedirect(reverse('index'))
             else:
                 return render(request, 'codeeditor/form.html', {'form': form, 'action': reverse('addfile')})
         else:
@@ -288,7 +288,7 @@ class AddSectionView(View):
 
                 file = section.get_file()
 
-                return HttpResponseRedirect(reverse('main', kwargs={'id': file.pk}))
+                return HttpResponseRedirect(reverse('index'))
             else:
                 return render(request,
                               'codeeditor/form.html',

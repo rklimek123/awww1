@@ -1,1 +1,1 @@
-<span {% if file == selected_file %}class="selected"{% else %}onclick="reload_page('{% url 'main' id=file.pk %}', {{ file.pk }})"{% endif %}>{{ file.name }}</span>
+<a {% if file == selected_file %}class="selected"{% else %}onclick="reload_page('{% url 'main' id=file.pk %}', {{ file.pk }})"{% endif %}>{{ file.name }}</a>
