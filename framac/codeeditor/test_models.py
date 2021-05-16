@@ -1,3 +1,4 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from .models import *
 
@@ -21,16 +22,14 @@ class FilesystemTestCase(TestCase):
             arg='z3-ce'
         )
 
-        f = open("test_frama.c", "w")
-        f.write(
-            r"""
+        f = SimpleUploadedFile("test_frama.c", b"""
 #pragma JessieIntegerModel(math)
 
 /*@ predicate Sorted{L}(int *a, integer l, integer h) =
-  @   \forall integer i,j; l <= i <= j < h ==> a[i] <= a[j] ;
+  @   \\forall integer i,j; l <= i <= j < h ==> a[i] <= a[j] ;
   @*/
 
-/*@ requires \valid_range(t,0,n-1);
+/*@ requires \\valid_range(t,0,n-1);
   @ ensures Sorted(t,0,n-1);
   @*/
 void insert_sort(int t[], int n) {
@@ -47,7 +46,7 @@ void insert_sort(int t[], int n) {
     /*@ loop invariant 0 <= j <= i;
       @ loop invariant j == i ==> Sorted(t,0,i);
       @ loop invariant j < i ==> Sorted(t,0,i+1);
-      @ loop invariant \forall integer k; j <= k < i ==> t[k] > mv;
+      @ loop invariant \\forall integer k; j <= k < i ==> t[k] > mv;
       @ loop variant j;
       @*/
     // look for the right index j to put t[i]
@@ -65,22 +64,17 @@ Local Variables:
 compile-command: "frama-c -jessie insertion_sort.c"
 End:
 */
-            """
-        )
-        f.close()
-
-        f_read = open("test_frama.c", "r")
+""")
 
         file = File.objects.create(
+            pk=1,
             name='test_file.c',
             description='Test file',
-            content=f_read,
+            content=f,
             directory=dir_outer,
             prover=None,
             vcs=''
         )
-
-        f_read.close()
 
         category_invariant = SectionCategory.objects.create(
             name='invariant'
@@ -118,7 +112,7 @@ End:
         )
 
 
-    def directory_breadcrumbs(self):
+    def test_directory_breadcrumbs(self):
         dir_outer = Directory.objects.get(name='outer')
         dir_inner = Directory.objects.get(name='inner')
 
@@ -128,54 +122,54 @@ End:
         self.assertEqual(dir_outer.__str__(), '~/outer/')
         self.assertEqual(dir_inner.__str__(), '~/outer/inner/')
 
-    # def directory_mark_inavailable(self):
+    # def test_directory_mark_inavailable(self):
     # todo
 
-    # def directory_meta(self):
+    # def test_directory_meta(self):
     # todo
 
 
-    def prover_str(self):
+    def test_prover_str(self):
         prover = Prover.objects.get(name='Z3')
 
         self.assertEqual(prover.__str__(), 'Z3')
 
 
-    def file_str(self):
+    def test_file_str(self):
         file = File.objects.get(name='test_file.c')
 
         self.assertEqual(file.__str__(), '~/outer/test_file.c')
 
-    # def file_mark_inavailable(self):
+    # def test_file_mark_inavailable(self):
     # todo
 
-    # def file_get_content(self):
+    # def test_file_get_content(self):
     # todo
 
 
-    def sectioncategory_str(self):
+    def test_sectioncategory_str(self):
         section_category = SectionCategory.objects.get(name='invariant')
 
         self.assertEqual(section_category.__str__(), '<invariant>')
 
-    # def sectioncategory_meta(self):
+    # def test_sectioncategory_meta(self):
     # todo
 
 
-    def sectionstatus_str(self):
+    def test_sectionstatus_str(self):
         section_status = SectionStatus.objects.get(name='OK')
 
         self.assertEqual(section_status.__str__(), '[OK]')
 
-    # def sectionstatus_meta(self):
+    # def test_sectionstatus_meta(self):
     # todo
 
 
-    def sectionstatusdata_meta(self):
+    def test_sectionstatusdata_meta(self):
         self.assertEqual(SectionStatusData._meta.verbose_name_plural, "Section statuses' data")
 
 
-    def filesection_get_file(self):
+    def test_filesection_get_file(self):
         subsection = FileSection.objects.get(name='invariant inner loop')
         section = FileSection.objects.get(name='invariant outer loop')
         file = File.objects.get(name='test_file.c')
@@ -183,14 +177,14 @@ End:
         self.assertEqual(section.get_file(), file)
         self.assertEqual(subsection.get_file(), file)
 
-    # def filesection_mark_inavailable(self):
+    # def test_filesection_mark_inavailable(self):
     # todo
 
-    # def filesection_get_raw_name(self):
+    # def test_filesection_get_raw_name(self):
     # todo
 
-    # def filesection_str(self):
+    # def test_filesection_str(self):
     # todo
 
-    # def filesection_get_hierarchy_name(self):
+    # def test_filesection_get_hierarchy_name(self):
     # todo

@@ -1,4 +1,4 @@
-from django.db.models import QuerySet
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from .forms import *
@@ -27,66 +27,59 @@ class CodeEditorContextTestCase(TestCase):
             arg='z3-ce'
         )
 
-        f = open("test_frama.c", "w")
-        f.write(
-            r"""
-#pragma JessieIntegerModel(math)
+        f = SimpleUploadedFile("test_frama.c", b"""
+        #pragma JessieIntegerModel(math)
 
-/*@ predicate Sorted{L}(int *a, integer l, integer h) =
-  @   \forall integer i,j; l <= i <= j < h ==> a[i] <= a[j] ;
-  @*/
+        /*@ predicate Sorted{L}(int *a, integer l, integer h) =
+          @   \\forall integer i,j; l <= i <= j < h ==> a[i] <= a[j] ;
+          @*/
 
-/*@ requires \valid_range(t,0,n-1);
-  @ ensures Sorted(t,0,n-1);
-  @*/
-void insert_sort(int t[], int n) {
-  int i,j;
-  int mv;
-  if (n <= 1) return;
-  /*@ loop invariant 0 <= i <= n;
-    @ loop invariant Sorted(t,0,i);
-    @ loop variant n-i;
-    @*/
-  for (i=1; i<n; i++) {
-    // assuming t[0..i-1] is sorted, insert t[i] at the right place
-    mv = t[i]; 
-    /*@ loop invariant 0 <= j <= i;
-      @ loop invariant j == i ==> Sorted(t,0,i);
-      @ loop invariant j < i ==> Sorted(t,0,i+1);
-      @ loop invariant \forall integer k; j <= k < i ==> t[k] > mv;
-      @ loop variant j;
-      @*/
-    // look for the right index j to put t[i]
-    for (j=i; j > 0; j--) {
-      if (t[j-1] <= mv) break;
-      t[j] = t[j-1];
-    }
-    t[j] = mv;
-  }
-}
+        /*@ requires \\valid_range(t,0,n-1);
+          @ ensures Sorted(t,0,n-1);
+          @*/
+        void insert_sort(int t[], int n) {
+          int i,j;
+          int mv;
+          if (n <= 1) return;
+          /*@ loop invariant 0 <= i <= n;
+            @ loop invariant Sorted(t,0,i);
+            @ loop variant n-i;
+            @*/
+          for (i=1; i<n; i++) {
+            // assuming t[0..i-1] is sorted, insert t[i] at the right place
+            mv = t[i]; 
+            /*@ loop invariant 0 <= j <= i;
+              @ loop invariant j == i ==> Sorted(t,0,i);
+              @ loop invariant j < i ==> Sorted(t,0,i+1);
+              @ loop invariant \\forall integer k; j <= k < i ==> t[k] > mv;
+              @ loop variant j;
+              @*/
+            // look for the right index j to put t[i]
+            for (j=i; j > 0; j--) {
+              if (t[j-1] <= mv) break;
+              t[j] = t[j-1];
+            }
+            t[j] = mv;
+          }
+        }
 
 
-/*
-Local Variables:
-compile-command: "frama-c -jessie insertion_sort.c"
-End:
-*/
-            """
-        )
-        f.close()
-
-        f_read = open("test_frama.c", "r")
+        /*
+        Local Variables:
+        compile-command: "frama-c -jessie insertion_sort.c"
+        End:
+        */
+        """)
 
         file = File.objects.create(
+            pk=1,
             name='test_file.c',
             description='Test file',
-            content=f_read,
+            content=f,
             directory=dir_outer,
-            prover=prover,
-            vcs='-@invariant'
+            prover=None,
+            vcs=''
         )
-
-        f_read.close()
 
         category_invariant = SectionCategory.objects.create(
             name='invariant'
@@ -125,9 +118,8 @@ End:
 
     def authorize(self):
         response = self.client.post(reverse('login'), {'username': 'userTEST', 'password': 'rk418291!students'})
-        self.assertIn(response.status_code, [200, 301, 302])
 
-    def view_blank(self):
+    def test_view_blank(self):
         self.authorize()
 
         response = self.client.get(reverse('index'))
@@ -163,7 +155,7 @@ End:
             for file in in_files:
                 self.assertTrue(file.parent == direct)
 
-    def pre_verification(self):
+    def test_pre_verification(self):
         self.authorize()
         file = File.objects.get(name='test_file.c')
 
@@ -207,7 +199,7 @@ End:
         self.assertEqual(ctx['provers_form'], forms.ChooseProverForm())
         self.assertEqual(ctx['vcs_form'], forms.ChooseVcForm())
 
-    def view_selected(self):
+    def test_view_selected(self):
         self.authorize()
         file = File.objects.get(name='test_file.c')
 
@@ -256,7 +248,7 @@ End:
         self.assertEqual(ctx['first_section'], frama_out[0])
         self.assertEqual(ctx['sections'], frama_out[1])
 
-    def view_selected_custom(self):
+    def test_view_selected_custom(self):
         self.authorize()
         file = File.objects.get(name='test_file.c')
 
@@ -304,7 +296,7 @@ End:
         self.assertEqual(ctx['first_section'], frama_out[0])
         self.assertEqual(ctx['sections'], frama_out[1])
 
-    def add_file(self):
+    def test_add_file(self):
         self.authorize()
 
         response = self.client.get(reverse('addfile'))
@@ -313,7 +305,7 @@ End:
         self.assertTrue(ctx['form'] is AddFileForm)
         self.assertEqual(ctx['action'], reverse('addfile'))
 
-    def add_section(self):
+    def test_add_section(self):
         self.authorize()
 
         response = self.client.get(reverse('addsection'))
@@ -322,7 +314,7 @@ End:
         self.assertTrue(ctx['form'] is AddSectionForm)
         self.assertEqual(ctx['action'], reverse('addsection'))
 
-    def add_directory(self):
+    def test_add_directory(self):
         self.authorize()
 
         response = self.client.get(reverse('adddirectory'))
@@ -331,7 +323,7 @@ End:
         self.assertTrue(ctx['form'] is AddDirectoryForm)
         self.assertEqual(ctx['action'], reverse('adddirectory'))
 
-    def delete_file(self):
+    def test_delete_file(self):
         self.authorize()
 
         response = self.client.get(reverse('deletefile'))
@@ -340,7 +332,7 @@ End:
         self.assertTrue(ctx['form'] is DeleteFileForm)
         self.assertEqual(ctx['action'], reverse('deletefile'))
 
-    def delete_directory(self):
+    def test_delete_directory(self):
         self.authorize()
 
         response = self.client.get(reverse('deletedirectory'))
