@@ -181,7 +181,10 @@ class CodeEditorPreVerification(CodeEditorViewBlank):
             else:
                 raise Exception("503 - Bad Request (POST)")
             file.save()
-            return HttpResponseRedirect(reverse('noframa', kwargs={'id': file.pk}))
+
+            ctx = self.get_context(request, args, **kwargs)
+            ctx['onload'] = "reload_page('" + reverse('main', kwargs={'id': file.pk}) + "', " + str(file.pk) + ')'
+            return render(request, 'codeeditor/main.html', ctx)
         else:
             return HttpResponseRedirect(reverse('login'))
 
@@ -245,7 +248,10 @@ class AddFileView(View):
                                    directory=form.cleaned_data['directory'],
                                    owner=request.user)
                 file.save()
-                return HttpResponseRedirect(reverse('index'))
+                ctx = {}
+                ctx['selected_file'] = file
+                ctx['onload'] = "reload_page('" + reverse('main', kwargs={'id': file.pk}) + "', " + str(file.pk) + ')'
+                return render(request, 'codeeditor/main.html', ctx)
             else:
                 return render(request, 'codeeditor/form.html', {'form': form, 'action': reverse('addfile')})
         else:
@@ -288,7 +294,10 @@ class AddSectionView(View):
 
                 file = section.get_file()
 
-                return HttpResponseRedirect(reverse('index'))
+                ctx = {}
+                ctx['selected_file'] = file
+                ctx['onload'] = "reload_page('" + reverse('main', kwargs={'id': file.pk}) + "', " + str(file.pk) + ')'
+                return render(request, 'codeeditor/main.html', ctx)
             else:
                 return render(request,
                               'codeeditor/form.html',

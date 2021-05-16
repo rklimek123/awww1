@@ -16,6 +16,8 @@ function replace(doc, section) {
 var wanted_file = 0;
 
 function reload_page(url, file_id) {
+    window.history.replaceState('object or string', 'Title', '/');
+
     wanted_file = file_id;
     const no_frama_url = "/noframa" + url.substring(5);
     const xhttp = new XMLHttpRequest();

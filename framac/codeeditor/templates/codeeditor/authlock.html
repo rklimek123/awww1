@@ -16,7 +16,7 @@
 	<meta name="keywords" content="Code, Editor, Text, Online"/>
 	<meta name="description" content="An online code editor"/>
 </head>
-<body>
+<body {% if onload %}onload="{{ onload }}"{% endif %}>
 {% block content %}
 {% endblock %}
 </body>
