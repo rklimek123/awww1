@@ -255,7 +255,6 @@ End:
         self.assertEqual(ctx['first_section'], frama_out[0])
         self.assertEqual(ctx['sections'], frama_out[1])
 
-
     def view_selected_custom(self):
         self.authorize()
         file = File.objects.get(name='test_file.c')
@@ -304,10 +303,55 @@ End:
         self.assertEqual(ctx['first_section'], frama_out[0])
         self.assertEqual(ctx['sections'], frama_out[1])
 
+    def add_file(self):
+        self.authorize()
 
-# todo Add i inne formy
+        response = self.client.get(reverse('addfile'))
+        self.assertEqual(response.status_code, 200)
+        ctx = response.context
+        self.assertTrue(ctx['form'] is AddFileForm)
+        self.assertEqual(ctx['action'], reverse('addfile'))
+
+    def add_section(self):
+        self.authorize()
+
+        response = self.client.get(reverse('addsection'))
+        self.assertEqual(response.status_code, 200)
+        ctx = response.context
+        self.assertTrue(ctx['form'] is AddSectionForm)
+        self.assertEqual(ctx['action'], reverse('addsection'))
+
+    def add_directory(self):
+        self.authorize()
+
+        response = self.client.get(reverse('adddirectory'))
+        self.assertEqual(response.status_code, 200)
+        ctx = response.context
+        self.assertTrue(ctx['form'] is AddDirectoryForm)
+        self.assertEqual(ctx['action'], reverse('adddirectory'))
+
+    def delete_file(self):
+        self.authorize()
+
+        response = self.client.get(reverse('deletefile'))
+        self.assertEqual(response.status_code, 200)
+        ctx = response.context
+        self.assertTrue(ctx['form'] is DeleteFileForm)
+        self.assertEqual(ctx['action'], reverse('deletefile'))
+
+    def delete_directory(self):
+        self.authorize()
+
+        response = self.client.get(reverse('deletedirectory'))
+        self.assertEqual(response.status_code, 200)
+        ctx = response.context
+        self.assertTrue(ctx['form'] is DeleteDirectoryForm)
+        self.assertEqual(ctx['action'], reverse('deletedirectory'))
+
 
 # class CodeEditorPostTestCase(TestCase):
 # todo
 
 
+# class CodeEditorFramaTestCase(TestCase):
+# todo
