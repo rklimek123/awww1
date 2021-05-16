@@ -135,7 +135,7 @@ class SectionStatus(models.Model):
 
 class SectionStatusData(models.Model):
     content = models.TextField(max_length=5000)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'available': True})
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, limit_choices_to={'available': True})
     creation_date = models.DateTimeField(auto_now_add=True)
     modify_date = models.DateTimeField(auto_now=True)
     available = models.BooleanField(default=True)
