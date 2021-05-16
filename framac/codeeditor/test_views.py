@@ -1,6 +1,5 @@
 from django.db.models import QuerySet
-from django.test import Client, TestCase
-from django.test.utils import setup_test_environment
+from django.test import TestCase
 
 from .forms import *
 from .models import *
@@ -86,6 +85,8 @@ End:
             prover=prover,
             vcs='-@invariant'
         )
+
+        f_read.close()
 
         category_invariant = SectionCategory.objects.create(
             name='invariant'

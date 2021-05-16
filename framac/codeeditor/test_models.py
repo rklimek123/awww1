@@ -4,8 +4,6 @@ from .models import *
 
 class FilesystemTestCase(TestCase):
     def setUp(self):
-        user = User.objects.get_or_create(pk=1)
-
         dir_outer = Directory.objects.create(
             name='outer',
             description='Test directory',
@@ -81,6 +79,8 @@ End:
             prover=None,
             vcs=''
         )
+
+        f_read.close()
 
         category_invariant = SectionCategory.objects.create(
             name='invariant'
