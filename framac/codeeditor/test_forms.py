@@ -52,7 +52,6 @@ class AddSectionFormTestCase(TestCase):
         """)
 
         file = File.objects.create(
-            pk=1,
             name='test_file.c',
             description='Test file',
             content=f,
@@ -70,10 +69,11 @@ class AddSectionFormTestCase(TestCase):
         )
 
         status_data_ok = SectionStatusData.objects.create(
-            content='Proved successfully'
+            content='Proved successfully',
+            user=None
         )
 
-        file_section = FileSection.objects.create(
+        file_section = FileSection(
             name='invariant outer loop',
             description='Outer loop invariant testing the correctness of this certain invariant',
             section_category=category_invariant,
@@ -84,165 +84,141 @@ class AddSectionFormTestCase(TestCase):
             parent_file=file
         )
 
+        file_section.save()
+
     def test_add_section_to_file_ok(self):
         file = File.objects.get(name='test_file.c')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = False
-        form.parent_section = None
-        form.parent_file = file
-        form.description = 'section description'
-        form.begin = 22
-        form.end = 34
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+            'section_status_content': "content of section",
+            'is_subsection': False,
+            'parent_section': None,
+            'parent_file': file,
+            'description': 'section description',
+            'begin': 22,
+            'end': 34,
+            'section_category': SectionCategory.objects.get(name='invariant'),
+            'section_status': SectionStatus.objects.get(name='OK')
+        })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(False)
-
-        self.assertTrue(True)
+        self.assertTrue(form.is_valid())
 
     def test_add_section_to_section_ok(self):
         section = FileSection.objects.get(name='invariant outer loop')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = True
-        form.parent_section = section
-        form.parent_file = None
-        form.description = 'section description'
-        form.begin = 22
-        form.end = 34
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+                'section_status_content': "content of section",
+                'is_subsection': True,
+                'parent_section': section,
+                'parent_file': None,
+                'description': 'section description',
+                'begin': 22,
+                'end': 34,
+                'section_category': SectionCategory.objects.get(name='invariant'),
+                'section_status': SectionStatus.objects.get(name='OK')
+        })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(False)
-
-        self.assertTrue(True)
+        self.assertTrue(form.is_valid())
 
     def test_add_section_double_parents(self):
         section = FileSection.objects.get(name='invariant outer loop')
         file = File.objects.get(name='test_file.c')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = False
-        form.parent_section = section
-        form.parent_file = file
-        form.description = 'section description'
-        form.begin = 22
-        form.end = 34
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+                'section_status_content': "content of section",
+                'is_subsection': False,
+                'parent_section': section,
+                'parent_file': file,
+                'description': 'section description',
+                'begin': 22,
+                'end': 34,
+                'section_category': SectionCategory.objects.get(name='invariant'),
+                'section_status': SectionStatus.objects.get(name='OK')
+            })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(True)
-        self.assertTrue(False)
+        self.assertFalse(form.is_valid())
 
     def test_add_section_to_section_wrong_mark(self):
         section = FileSection.objects.get(name='invariant outer loop')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = False
-        form.parent_section = section
-        form.parent_file = None
-        form.description = 'section description'
-        form.begin = 22
-        form.end = 34
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+                'section_status_content': "content of section",
+                'is_subsection': False,
+                'parent_section': section,
+                'parent_file': None,
+                'description': 'section description',
+                'begin': 22,
+                'end': 34,
+                'section_category': SectionCategory.objects.get(name='invariant'),
+                'section_status': SectionStatus.objects.get(name='OK')
+            })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(True)
-        self.assertTrue(False)
+        self.assertFalse(form.is_valid())
 
     def test_add_section_to_file_wrong_mark(self):
         file = File.objects.get(name='test_file.c')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = True
-        form.parent_section = None
-        form.parent_file = file
-        form.description = 'section description'
-        form.begin = 22
-        form.end = 34
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+            'section_status_content': "content of section",
+            'is_subsection': True,
+            'parent_section': None,
+            'parent_file': file,
+            'description': 'section description',
+            'begin': 22,
+            'end': 34,
+            'section_category': SectionCategory.objects.get(name='invariant'),
+            'section_status': SectionStatus.objects.get(name='OK')
+        })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(True)
-        self.assertTrue(False)
+        self.assertFalse(form.is_valid())
 
     def test_add_section_to_section_not_contained(self):
         section = FileSection.objects.get(name='invariant outer loop')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = True
-        form.parent_section = section
-        form.parent_file = None
-        form.description = 'section description'
-        form.begin = 2
-        form.end = 30
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+               'section_status_content': "content of section",
+               'is_subsection': True,
+               'parent_section': section,
+               'parent_file': None,
+               'description': 'section description',
+               'begin': 2,
+               'end': 30,
+               'section_category': SectionCategory.objects.get(name='invariant'),
+               'section_status': SectionStatus.objects.get(name='OK')
+        })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(True)
-        self.assertTrue(False)
+        self.assertFalse(form.is_valid())
 
     def test_add_section_negative_line(self):
         file = File.objects.get(name='test_file.c')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = False
-        form.parent_section = None
-        form.parent_file = file
-        form.description = 'section description'
-        form.begin = -22
-        form.end = 34
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+            'section_status_content': "content of section",
+            'is_subsection': False,
+            'parent_section': None,
+            'parent_file': file,
+            'description': 'section description',
+            'begin': -22,
+            'end': 34,
+            'section_category': SectionCategory.objects.get(name='invariant'),
+            'section_status': SectionStatus.objects.get(name='OK')
+        })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(True)
-        self.assertTrue(False)
+        self.assertFalse(form.is_valid())
 
     def test_add_section_begin_greater_than_end(self):
         file = File.objects.get(name='test_file.c')
 
-        form = AddSectionForm()
-        form.section_status_content = "content of section"
-        form.is_subsection = False
-        form.parent_section = None
-        form.parent_file = file
-        form.description = 'section description'
-        form.begin = 34
-        form.end = 22
-        section_category = SectionCategory.objects.get(name='invariant')
-        section_status = SectionStatus.objects.get(name='OK')
+        form = AddSectionForm({
+            'section_status_content': "content of section",
+            'is_subsection': False,
+            'parent_section': None,
+            'parent_file': file,
+            'description': 'section description',
+            'begin': 34,
+            'end': 22,
+            'section_category': SectionCategory.objects.get(name='invariant'),
+            'section_status': SectionStatus.objects.get(name='OK')
+        })
 
-        try:
-            form.clean()
-        except:
-            self.assertTrue(True)
-        self.assertTrue(False)
+        self.assertFalse(form.is_valid())

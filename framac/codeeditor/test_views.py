@@ -93,7 +93,11 @@ class CodeEditorContextTestCase(TestCase):
             content='Proved successfully'
         )
 
-        file_section = FileSection.objects.create(
+        status_data_sub_ok = SectionStatusData.objects.create(
+            content='Proved successfully sub'
+        )
+
+        file_section = FileSection(
             name='invariant outer loop',
             description='Outer loop invariant testing the correctness of this certain invariant',
             section_category=category_invariant,
@@ -103,18 +107,21 @@ class CodeEditorContextTestCase(TestCase):
             end=34,
             parent_file=file
         )
+        file_section.save()
 
-        file_section_sub = FileSection.objects.create(
+        file_section_sub = FileSection(
             name='invariant inner loop',
             description='Inner loop invariant testing the correctness of this certain invariant',
             section_category=category_invariant,
             section_status=status_ok,
-            section_status_data=status_data_ok,
+            section_status_data=status_data_sub_ok,
             begin=22,
             end=32,
             is_subsection=True,
-            parent_section=file_section
+            parent_section=file_section,
+            parent_file=file
         )
+        file_section_sub.save()
 
     def authorize(self):
         response = self.client.post(reverse('login'), {'username': 'userTEST', 'password': 'rk418291!students'})
@@ -125,22 +132,26 @@ class CodeEditorContextTestCase(TestCase):
         response = self.client.get(reverse('index'))
         self.assertEqual(response.status_code, 200)
         ctx = response.context
+
         self.assertQuerysetEqual(ctx['inroot_dirs'],
                                  Directory.objects.filter(
                                      parent=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         self.assertQuerysetEqual(ctx['inroot_files'],
                                  File.objects.filter(
                                      directory=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         for direct, in_dirs in ctx['in_dirs'].items():
             self.assertQuerysetEqual(
                 Directory.objects.filter(parent=direct, available=True),
-                in_dirs
+                in_dirs,
+                transform=lambda x: x
             )
 
             for dire in in_dirs:
@@ -149,11 +160,12 @@ class CodeEditorContextTestCase(TestCase):
         for direct, in_files in ctx['in_files'].items():
             self.assertQuerysetEqual(
                 File.objects.filter(directory=direct, available=True),
-                in_files
+                in_files,
+                transform=lambda x: x
             )
 
             for file in in_files:
-                self.assertTrue(file.parent == direct)
+                self.assertTrue(file.directory == direct)
 
     def test_pre_verification(self):
         self.authorize()
@@ -166,18 +178,21 @@ class CodeEditorContextTestCase(TestCase):
                                  Directory.objects.filter(
                                      parent=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         self.assertQuerysetEqual(ctx['inroot_files'],
                                  File.objects.filter(
                                      directory=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         for direct, in_dirs in ctx['in_dirs'].items():
             self.assertQuerysetEqual(
                 Directory.objects.filter(parent=direct, available=True),
-                in_dirs
+                in_dirs,
+                transform=lambda x: x
             )
 
             for dire in in_dirs:
@@ -186,18 +201,19 @@ class CodeEditorContextTestCase(TestCase):
         for direct, in_files in ctx['in_files'].items():
             self.assertQuerysetEqual(
                 File.objects.filter(directory=direct, available=True),
-                in_files
+                in_files,
+                transform=lambda x: x
             )
 
             for file in in_files:
-                self.assertTrue(file.parent == direct)
+                self.assertTrue(file.directory == direct)
 
         self.assertEqual(ctx['selected_file'], file)
         self.assertEqual(ctx['filelines'], file.get_content())
         self.assertEqual(ctx['tab'], 2)
         self.assertNotIn(ctx['result_tab'], ['', None])
-        self.assertEqual(ctx['provers_form'], forms.ChooseProverForm())
-        self.assertEqual(ctx['vcs_form'], forms.ChooseVcForm())
+        self.assertIsInstance(ctx['provers_form'], forms.ChooseProverForm)
+        self.assertIsInstance(ctx['vcs_form'], forms.ChooseVcForm)
 
     def test_view_selected(self):
         self.authorize()
@@ -211,18 +227,21 @@ class CodeEditorContextTestCase(TestCase):
                                  Directory.objects.filter(
                                      parent=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         self.assertQuerysetEqual(ctx['inroot_files'],
                                  File.objects.filter(
                                      directory=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         for direct, in_dirs in ctx['in_dirs'].items():
             self.assertQuerysetEqual(
                 Directory.objects.filter(parent=direct, available=True),
-                in_dirs
+                in_dirs,
+                transform=lambda x: x
             )
 
             for dire in in_dirs:
@@ -231,11 +250,12 @@ class CodeEditorContextTestCase(TestCase):
         for direct, in_files in ctx['in_files'].items():
             self.assertQuerysetEqual(
                 File.objects.filter(directory=direct, available=True),
-                in_files
+                in_files,
+                transform=lambda x: x
             )
 
             for file in in_files:
-                self.assertTrue(file.parent == direct)
+                self.assertTrue(file.directory == direct)
 
         self.assertEqual(ctx['selected_file'], file)
         self.assertEqual(ctx['filelines'], file.get_content())
@@ -245,8 +265,9 @@ class CodeEditorContextTestCase(TestCase):
         self.assertEqual(frama_result[0], 0)
 
         frama_out = parse_frama_output(frama_result[1], file)
-        self.assertEqual(ctx['first_section'], frama_out[0])
-        self.assertEqual(ctx['sections'], frama_out[1])
+
+        self.assertEqual(ctx['first_section'][0], frama_out[0][0])
+        self.assertEqual(ctx['sections'][0], frama_out[1][0])
 
     def test_view_selected_custom(self):
         self.authorize()
@@ -260,18 +281,21 @@ class CodeEditorContextTestCase(TestCase):
                                  Directory.objects.filter(
                                      parent=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         self.assertQuerysetEqual(ctx['inroot_files'],
                                  File.objects.filter(
                                      directory=None,
                                      available=True
-                                 ))
+                                 ),
+                                 transform=lambda x: x)
 
         for direct, in_dirs in ctx['in_dirs'].items():
             self.assertQuerysetEqual(
                 Directory.objects.filter(parent=direct, available=True),
-                in_dirs
+                in_dirs,
+                transform=lambda x: x
             )
 
             for dire in in_dirs:
@@ -280,11 +304,12 @@ class CodeEditorContextTestCase(TestCase):
         for direct, in_files in ctx['in_files'].items():
             self.assertQuerysetEqual(
                 File.objects.filter(directory=direct, available=True),
-                in_files
+                in_files,
+                transform=lambda x: x
             )
 
             for file in in_files:
-                self.assertTrue(file.parent == direct)
+                self.assertTrue(file.directory == direct)
 
         self.assertEqual(ctx['selected_file'], file)
         self.assertEqual(ctx['filelines'], file.get_content())
@@ -293,8 +318,19 @@ class CodeEditorContextTestCase(TestCase):
         self.assertEqual(frama_result[0], 0)
 
         frama_out = parse_frama_output(frama_result[1], file)
-        self.assertEqual(ctx['first_section'], frama_out[0])
-        self.assertEqual(ctx['sections'], frama_out[1])
+        self.assertEqual(ctx['first_section'][0], frama_out[0][0])
+
+        try:
+            print(ctx['sections'][0])
+            self.assertTrue(False)
+        except IndexError:
+            self.assertTrue(True)
+
+        try:
+            print(frama_out[1][0])
+            self.assertTrue(False)
+        except IndexError:
+            self.assertTrue(True)
 
     def test_add_file(self):
         self.authorize()
@@ -302,7 +338,7 @@ class CodeEditorContextTestCase(TestCase):
         response = self.client.get(reverse('addfile'))
         self.assertEqual(response.status_code, 200)
         ctx = response.context
-        self.assertTrue(ctx['form'] is AddFileForm)
+        self.assertIsInstance(ctx['form'], AddFileForm)
         self.assertEqual(ctx['action'], reverse('addfile'))
 
     def test_add_section(self):
@@ -311,7 +347,7 @@ class CodeEditorContextTestCase(TestCase):
         response = self.client.get(reverse('addsection'))
         self.assertEqual(response.status_code, 200)
         ctx = response.context
-        self.assertTrue(ctx['form'] is AddSectionForm)
+        self.assertIsInstance(ctx['form'], AddSectionForm)
         self.assertEqual(ctx['action'], reverse('addsection'))
 
     def test_add_directory(self):
@@ -320,7 +356,7 @@ class CodeEditorContextTestCase(TestCase):
         response = self.client.get(reverse('adddirectory'))
         self.assertEqual(response.status_code, 200)
         ctx = response.context
-        self.assertTrue(ctx['form'] is AddDirectoryForm)
+        self.assertIsInstance(ctx['form'], AddDirectoryForm)
         self.assertEqual(ctx['action'], reverse('adddirectory'))
 
     def test_delete_file(self):
@@ -329,7 +365,7 @@ class CodeEditorContextTestCase(TestCase):
         response = self.client.get(reverse('deletefile'))
         self.assertEqual(response.status_code, 200)
         ctx = response.context
-        self.assertTrue(ctx['form'] is DeleteFileForm)
+        self.assertIsInstance(ctx['form'], DeleteFileForm)
         self.assertEqual(ctx['action'], reverse('deletefile'))
 
     def test_delete_directory(self):
@@ -338,7 +374,7 @@ class CodeEditorContextTestCase(TestCase):
         response = self.client.get(reverse('deletedirectory'))
         self.assertEqual(response.status_code, 200)
         ctx = response.context
-        self.assertTrue(ctx['form'] is DeleteDirectoryForm)
+        self.assertIsInstance(ctx['form'], DeleteDirectoryForm)
         self.assertEqual(ctx['action'], reverse('deletedirectory'))
 
 

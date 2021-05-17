@@ -35,7 +35,7 @@ class AddSectionForm(forms.ModelForm):
             super_end = psection.end
             if begin < super_begin or end > super_end:
                 raise forms.ValidationError("Subsection must be contained in parent section: (" +
-                                            super_begin + ", " + super_end + ")")
+                                            str(super_begin) + ", " + str(super_end) + ")")
         else:
             if pfile is None:
                 raise forms.ValidationError("Main Section must have a file parent.")

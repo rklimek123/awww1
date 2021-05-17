@@ -67,7 +67,6 @@ End:
 """)
 
         file = File.objects.create(
-            pk=1,
             name='test_file.c',
             description='Test file',
             content=f,
@@ -88,7 +87,11 @@ End:
             content='Proved successfully'
         )
 
-        file_section = FileSection.objects.create(
+        status_data_sub_ok = SectionStatusData.objects.create(
+            content='Proved successfully sub'
+        )
+
+        file_section = FileSection(
             name='invariant outer loop',
             description='Outer loop invariant testing the correctness of this certain invariant',
             section_category=category_invariant,
@@ -98,18 +101,21 @@ End:
             end=34,
             parent_file=file
         )
+        file_section.save()
 
-        file_section_sub = FileSection.objects.create(
+        file_section_sub = FileSection(
             name='invariant inner loop',
             description='Inner loop invariant testing the correctness of this certain invariant',
             section_category=category_invariant,
             section_status=status_ok,
-            section_status_data=status_data_ok,
+            section_status_data=status_data_sub_ok,
             begin=22,
             end=32,
             is_subsection=True,
-            parent_section=file_section
+            parent_section=file_section,
+            parent_file=file
         )
+        file_section_sub.save()
 
 
     def test_directory_breadcrumbs(self):
