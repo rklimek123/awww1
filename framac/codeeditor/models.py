@@ -169,6 +169,7 @@ class FileSection(models.Model):
                                        limit_choices_to={'available': True})
     parent_file = models.ForeignKey(File,
                                     on_delete=models.CASCADE,
+                                    blank=True,
                                     limit_choices_to={'available': True})
 
     creation_date = models.DateTimeField(auto_now_add=True)
