@@ -1,8 +1,8 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
-from .forms import *
-from .models import *
+from codeeditor.forms import *
+from codeeditor.models import *
 
 
 class AddSectionFormTestCase(TestCase):

@@ -1,6 +1,6 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from .models import *
+from codeeditor.models import *
 
 
 class FilesystemTestCase(TestCase):
